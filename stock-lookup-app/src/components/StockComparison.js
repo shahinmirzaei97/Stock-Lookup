@@ -1,6 +1,6 @@
 // src/components/StockComparison.js
 import React from 'react';
-import StockGraph from './StockGraph'; // Import your StockGraph component
+import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
 
 const StockComparison = ({ selectedStocks }) => {
   return (
@@ -12,7 +12,7 @@ const StockComparison = ({ selectedStocks }) => {
           <StockGraph symbols={[selectedStocks[0].symbol, selectedStocks[1].symbol]} />
         </div>
       ) : (
-        <div>Select two stocks to compare</div> // This will only show if there are not exactly two stocks selected
+        <div>Select two stocks to compare</div> // Shows this message if fewer than two stocks are selected
       )}
     </div>
   );

@@ -1,9 +1,9 @@
 // src/components/StockGraph.js
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'; // Import chart components from Recharts
 
 const StockGraph = ({ symbols }) => {
-  const [graphData, setGraphData] = useState([]);
+  const [graphData, setGraphData] = useState([]); // State to store graph data
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -19,16 +19,16 @@ const StockGraph = ({ symbols }) => {
 
         const results = await Promise.all(dataPromises);
         const combinedData = mergeStockData(results);
-        setGraphData(combinedData);
+        setGraphData(combinedData); // Set the combined data for the graph
       } catch (error) {
         console.error('Error fetching stock graph data:', error);
       }
     };
 
     fetchGraphData();
-  }, [symbols]);
+  }, [symbols]); // Refetch data when symbols change
 
-  // Function to merge stock data
+  // Function to merge historical data of multiple stocks
   const mergeStockData = (results) => {
     const combinedData = [];
     results[0].historical.forEach((entry, index) => {
@@ -48,7 +48,7 @@ const StockGraph = ({ symbols }) => {
   };
 
   return (
-    <div style={{ width: '100%', height: 200 }}>
+    <div style={{ width: '80%', height: 300 }}> {/* Adjusted height for scaling */}
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={graphData}

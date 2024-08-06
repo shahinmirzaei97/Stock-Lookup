@@ -2,21 +2,23 @@
 import React, { useState } from 'react';
 
 const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
-  const [symbol, setSymbol] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [symbol, setSymbol] = useState(''); // Manages the input field value for stock symbols
+  const [suggestions, setSuggestions] = useState([]); // Stores stock symbol suggestions based on user input
+  const [loading, setLoading] = useState(false); // Indicates whether data is being loaded
+  const [error, setError] = useState(null); // Stores any errors that occur during data fetching
 
+  // Handles changes in the input field
   const handleInputChange = (event) => {
     const input = event.target.value.toUpperCase();
     setSymbol(input);
     if (input.length >= 2) {
-      fetchSuggestions(input);
+      fetchSuggestions(input); // Fetch stock suggestions when input length is 2 or more
     } else {
-      setSuggestions([]);
+      setSuggestions([]); // Clear suggestions if input length is less than 2
     }
   };
 
+  // Fetches stock symbol suggestions from the API
   const fetchSuggestions = async (query) => {
     setLoading(true);
     setError(null);
@@ -26,14 +28,15 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setSuggestions(data);
+      setSuggestions(data); // Set the fetched suggestions
     } catch (err) {
-      setError(err.message);
+      setError(err.message); // Set the error message if fetching fails
     } finally {
       setLoading(false);
     }
   };
 
+  // Adds a stock to the portfolio
   const addStockToPortfolio = async (ticker) => {
     setLoading(true);
     setError(null);
@@ -52,17 +55,18 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
         selected: false,
       };
       if (!portfolio.find(stock => stock.symbol === newStock.symbol)) {
-        setPortfolio([...portfolio, newStock]);
+        setPortfolio([...portfolio, newStock]); // Add the stock to the portfolio if it does not already exist
       }
-      setSymbol('');
-      setSuggestions([]);
+      setSymbol(''); // Clear the input field
+      setSuggestions([]); // Clear the suggestions list
     } catch (err) {
-      setError(err.message);
+      setError(err.message); // Set the error message if adding stock fails
     } finally {
       setLoading(false);
     }
   };
 
+  // Toggles the selection state of a stock
   const toggleSelectStock = (symbol) => {
     const selectedCount = portfolio.filter(stock => stock.selected).length;
     const updatedPortfolio = portfolio.map(stock =>
@@ -72,8 +76,8 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
           ? stock 
           : { ...stock, selected: false }
     );
-    setPortfolio(updatedPortfolio);
-    setSelectedStocks(updatedPortfolio.filter(stock => stock.selected));
+    setPortfolio(updatedPortfolio); // Update the portfolio with the new selection state
+    setSelectedStocks(updatedPortfolio.filter(stock => stock.selected)); // Update selected stocks for comparison
   };
 
   return (
@@ -107,7 +111,7 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
                   type="checkbox"
                   checked={stock.selected}
                   onChange={() => toggleSelectStock(stock.symbol)}
-                  disabled={!stock.selected && portfolio.filter(s => s.selected).length >= 2} // Grey out other options
+                  disabled={!stock.selected && portfolio.filter(s => s.selected).length >= 2} // Disables checkbox if two stocks are already selected
                 />
                 {stock.symbol}: ${stock.price}
               </li>
