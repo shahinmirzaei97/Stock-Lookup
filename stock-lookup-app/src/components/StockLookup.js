@@ -1,21 +1,12 @@
 // src/components/StockLookup.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const StockLookup = () => {
-  // State for storing the input value
+const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
   const [symbol, setSymbol] = useState('');
-  // State for storing stock price
-  const [price, setPrice] = useState(null);
-  // State for loading status
-  const [loading, setLoading] = useState(false);
-  // State for error messages
-  const [error, setError] = useState(null);
-  // State for storing portfolio stocks
-  const [portfolio, setPortfolio] = useState([]);
-  // State for search suggestions
   const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Handle input changes and update suggestions
   const handleInputChange = (event) => {
     const input = event.target.value.toUpperCase();
     setSymbol(input);
@@ -26,19 +17,26 @@ const StockLookup = () => {
     }
   };
 
-  // Add selected stock to portfolio
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    addStockToPortfolio(symbol);
+  const fetchSuggestions = async (query) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&apikey=${process.env.REACT_APP_FMP_API_KEY}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Fetch stock data and add it to the portfolio
   const addStockToPortfolio = async (ticker) => {
     setLoading(true);
     setError(null);
-    setPrice(null);
-    setSuggestions([]);
-
     try {
       const response = await fetch(`https://financialmodelingprep.com/api/v3/quote/${ticker}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
       if (!response.ok) {
@@ -51,66 +49,67 @@ const StockLookup = () => {
       const newStock = {
         symbol: data[0].symbol,
         price: data[0].price,
+        selected: false,
       };
-      setPortfolio([...portfolio, newStock]); // Add stock to portfolio
+      if (!portfolio.find(stock => stock.symbol === newStock.symbol)) {
+        setPortfolio([...portfolio, newStock]);
+      }
       setSymbol('');
+      setSuggestions([]);
     } catch (err) {
-      setError(err.message); // Handle errors
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Remove stock from portfolio
-  const removeStockFromPortfolio = (ticker) => {
-    setPortfolio(portfolio.filter(stock => stock.symbol !== ticker));
-  };
-
-  // Fetch stock symbol suggestions
-  const fetchSuggestions = async (query) => {
-    try {
-      const response = await fetch(`https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setSuggestions(data); // Update suggestions based on search
-    } catch (err) {
-      console.error('Error fetching suggestions:', err.message);
-    }
+  const toggleSelectStock = (symbol) => {
+    const selectedCount = portfolio.filter(stock => stock.selected).length;
+    const updatedPortfolio = portfolio.map(stock =>
+      stock.symbol === symbol 
+        ? { ...stock, selected: !stock.selected } 
+        : selectedCount < 2 || stock.selected 
+          ? stock 
+          : { ...stock, selected: false }
+    );
+    setPortfolio(updatedPortfolio);
+    setSelectedStocks(updatedPortfolio.filter(stock => stock.selected));
   };
 
   return (
     <div>
       <h1>Stock Price Lookup</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={symbol}
-          onChange={handleInputChange}
-          placeholder="Enter stock symbol"
-        />
-        <button type="submit">Add to Portfolio</button>
-      </form>
+      <input
+        type="text"
+        value={symbol}
+        onChange={handleInputChange}
+        placeholder="Enter stock symbol"
+      />
+      {loading && <div>Loading...</div>}
+      {error && <div>Error: {error}</div>}
       {suggestions.length > 0 && (
         <ul>
           {suggestions.map((s) => (
-            <li key={s.symbol} onClick={() => addStockToPortfolio(s.symbol)}>
+            <li key={s.symbol}>
               {s.symbol} - {s.name}
+              <button onClick={() => addStockToPortfolio(s.symbol)} style={{ marginLeft: '10px', cursor: 'pointer' }}>➕</button>
             </li>
           ))}
         </ul>
       )}
-      {loading && <div>Loading...</div>}
-      {error && <div>Error: {error}</div>}
       {portfolio.length > 0 && (
         <div>
           <h2>Portfolio</h2>
           <ul>
             {portfolio.map((stock) => (
               <li key={stock.symbol}>
+                <input
+                  type="checkbox"
+                  checked={stock.selected}
+                  onChange={() => toggleSelectStock(stock.symbol)}
+                  disabled={!stock.selected && portfolio.filter(s => s.selected).length >= 2} // Grey out other options
+                />
                 {stock.symbol}: ${stock.price}
-                <button onClick={() => removeStockFromPortfolio(stock.symbol)}>Remove</button>
               </li>
             ))}
           </ul>
