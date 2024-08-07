@@ -1,20 +1,23 @@
 // src/components/StockComparison.js
 import React from 'react';
+import { Box, Heading, Text } from '@chakra-ui/react';
 import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
 
 const StockComparison = ({ selectedStocks }) => {
   return (
-    <div>
-      <h2>Stock Comparison</h2>
+    <Box p={5} mt={8} maxWidth="800px" mx="auto">
+      <Heading size="lg" mb={4}>Stock Comparison</Heading>
       {selectedStocks.length === 2 ? (
-        <div>
-          <h3>Comparing {selectedStocks[0].symbol} and {selectedStocks[1].symbol}</h3>
+        <Box>
+          <Heading size="md" mb={4}>
+            Comparing {selectedStocks[0].symbol} and {selectedStocks[1].symbol}
+          </Heading>
           <StockGraph symbols={[selectedStocks[0].symbol, selectedStocks[1].symbol]} />
-        </div>
+        </Box>
       ) : (
-        <div>Select two stocks to compare</div> // Shows this message if fewer than two stocks are selected
+        <Text>Select two stocks to compare.</Text>
       )}
-    </div>
+    </Box>
   );
 };
 

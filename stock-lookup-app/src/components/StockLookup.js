@@ -1,5 +1,6 @@
 // src/components/StockLookup.js
 import React, { useState } from 'react';
+import { Box, Input, Button, List, ListItem, Heading, Checkbox, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 
 const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
   const [symbol, setSymbol] = useState(''); // Manages the input field value for stock symbols
@@ -80,46 +81,60 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
     setSelectedStocks(updatedPortfolio.filter(stock => stock.selected)); // Update selected stocks for comparison
   };
 
+  // Remove a stock from the portfolio
+  const removeStockFromPortfolio = (symbol) => {
+    setPortfolio(portfolio.filter(stock => stock.symbol !== symbol));
+    setSelectedStocks(selectedStocks => selectedStocks.filter(stock => stock.symbol !== symbol));
+  };
+
   return (
-    <div>
-      <h1>Stock Price Lookup</h1>
-      <input
-        type="text"
+    <Box p={5} maxWidth="600px" mx="auto">
+      <Heading mb={4}>Stock Price Lookup</Heading>
+      <Input
         value={symbol}
         onChange={handleInputChange}
         placeholder="Enter stock symbol"
+        mb={4}
       />
-      {loading && <div>Loading...</div>}
-      {error && <div>Error: {error}</div>}
+      {loading && <Spinner />}
+      {error && (
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
       {suggestions.length > 0 && (
-        <ul>
+        <List spacing={3}>
           {suggestions.map((s) => (
-            <li key={s.symbol}>
+            <ListItem key={s.symbol} display="flex" justifyContent="space-between" alignItems="center">
               {s.symbol} - {s.name}
-              <button onClick={() => addStockToPortfolio(s.symbol)} style={{ marginLeft: '10px', cursor: 'pointer' }}>➕</button>
-            </li>
+              <Button onClick={() => addStockToPortfolio(s.symbol)} colorScheme="teal" size="sm">Add</Button>
+            </ListItem>
           ))}
-        </ul>
+        </List>
       )}
       {portfolio.length > 0 && (
-        <div>
-          <h2>Portfolio</h2>
-          <ul>
+        <Box mt={6}>
+          <Heading size="md" mb={3}>Portfolio</Heading>
+          <List spacing={3}>
             {portfolio.map((stock) => (
-              <li key={stock.symbol}>
-                <input
-                  type="checkbox"
-                  checked={stock.selected}
+              <ListItem key={stock.symbol} display="flex" alignItems="center">
+                <Checkbox
+                  isChecked={stock.selected}
                   onChange={() => toggleSelectStock(stock.symbol)}
-                  disabled={!stock.selected && portfolio.filter(s => s.selected).length >= 2} // Disables checkbox if two stocks are already selected
+                  isDisabled={!stock.selected && portfolio.filter(s => s.selected).length >= 2}
+                  mr={3}
                 />
                 {stock.symbol}: ${stock.price}
-              </li>
+                <Button onClick={() => removeStockFromPortfolio(stock.symbol)} colorScheme="red" size="sm" ml={3}>
+                  Remove
+                </Button>
+              </ListItem>
             ))}
-          </ul>
-        </div>
+          </List>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 
