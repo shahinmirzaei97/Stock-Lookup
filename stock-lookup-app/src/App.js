@@ -11,7 +11,6 @@ const App = () => {
   return (
     <ChakraProvider>
       <div>
-        <h1>Stock Portfolio App</h1>
         <StockLookup
           portfolio={portfolio}
           setPortfolio={setPortfolio}
