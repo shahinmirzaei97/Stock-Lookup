@@ -1,6 +1,7 @@
 // src/components/StockLookup.js
 import React, { useState } from 'react';
-import { Box, Input, Button, List, ListItem, Heading, Checkbox, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Input, Button, List, ListItem, Heading, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import Portfolio from './Portfolio'; // Import the renamed Portfolio component
 
 const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
   const [symbol, setSymbol] = useState(''); // Manages the input field value for stock symbols
@@ -113,27 +114,11 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
           ))}
         </List>
       )}
-      {portfolio.length > 0 && (
-        <Box mt={6}>
-          <Heading size="md" mb={3}>Portfolio</Heading>
-          <List spacing={3}>
-            {portfolio.map((stock) => (
-              <ListItem key={stock.symbol} display="flex" alignItems="center">
-                <Checkbox
-                  isChecked={stock.selected}
-                  onChange={() => toggleSelectStock(stock.symbol)}
-                  isDisabled={!stock.selected && portfolio.filter(s => s.selected).length >= 2}
-                  mr={3}
-                />
-                {stock.symbol}: ${stock.price}
-                <Button onClick={() => removeStockFromPortfolio(stock.symbol)} colorScheme="red" size="sm" ml={3}>
-                  Remove
-                </Button>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      )}
+      <Portfolio 
+        portfolio={portfolio}
+        toggleSelectStock={toggleSelectStock}
+        removeStockFromPortfolio={removeStockFromPortfolio}
+      />
     </Box>
   );
 };
