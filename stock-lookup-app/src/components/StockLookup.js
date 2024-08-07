@@ -2,12 +2,14 @@
 import React, { useState } from 'react';
 import { Box, Input, Button, List, ListItem, Heading, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import Portfolio from './Portfolio'; // Import the renamed Portfolio component
+import StockDetails from './StockDetails'; // Import the StockDetails component
 
 const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
   const [symbol, setSymbol] = useState(''); // Manages the input field value for stock symbols
   const [suggestions, setSuggestions] = useState([]); // Stores stock symbol suggestions based on user input
   const [loading, setLoading] = useState(false); // Indicates whether data is being loaded
   const [error, setError] = useState(null); // Stores any errors that occur during data fetching
+  const [selectedStock, setSelectedStock] = useState(null); // Manages the currently selected stock for detailed view
 
   // Handles changes in the input field
   const handleInputChange = (event) => {
@@ -88,8 +90,23 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
     setSelectedStocks(selectedStocks => selectedStocks.filter(stock => stock.symbol !== symbol));
   };
 
+  // Sets the selected stock for detailed view
+  const handleStockClick = (symbol) => {
+    setSelectedStock(symbol);
+  };
+
+  // Function to handle adding stock to portfolio from StockDetails component
+  const handleAddToPortfolio = (symbol) => {
+    addStockToPortfolio(symbol);
+  };
+
+  // Function to handle removing stock from portfolio from StockDetails component
+  const handleRemoveFromPortfolio = (symbol) => {
+    removeStockFromPortfolio(symbol);
+  };
+
   return (
-    <Box p={5} maxWidth="600px" mx="auto">
+    <Box p={5} maxWidth="800px" mx="auto">
       <Heading mb={4}>Stock Price Lookup</Heading>
       <Input
         value={symbol}
@@ -109,7 +126,8 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
           {suggestions.map((s) => (
             <ListItem key={s.symbol} display="flex" justifyContent="space-between" alignItems="center">
               {s.symbol} - {s.name}
-              <Button onClick={() => addStockToPortfolio(s.symbol)} colorScheme="teal" size="sm">Add</Button>
+              <Button onClick={() => handleStockClick(s.symbol)} colorScheme="teal" size="sm">View Details</Button>
+              <Button onClick={() => addStockToPortfolio(s.symbol)} colorScheme="teal" size="sm" ml={2}>Add</Button>
             </ListItem>
           ))}
         </List>
@@ -119,6 +137,14 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
         toggleSelectStock={toggleSelectStock}
         removeStockFromPortfolio={removeStockFromPortfolio}
       />
+      {selectedStock && (
+        <StockDetails
+          selectedStock={selectedStock}
+          onAddToPortfolio={handleAddToPortfolio}
+          onRemoveFromPortfolio={handleRemoveFromPortfolio}
+          isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
+        />
+      )}
     </Box>
   );
 };
