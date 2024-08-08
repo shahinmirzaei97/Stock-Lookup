@@ -1,6 +1,6 @@
 // src/components/StockLookup.js
 import React, { useState } from 'react';
-import { Box, Input, Button, List, ListItem, Heading, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Input, List, ListItem, Heading, Spinner, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import Portfolio from './Portfolio'; // Import the renamed Portfolio component
 import StockDetails from './StockDetails'; // Import the StockDetails component
 
@@ -70,6 +70,11 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
     }
   };
 
+  // Sets the selected stock for detailed view
+  const handleStockClick = (symbol) => {
+    setSelectedStock(symbol);
+  };
+
   // Toggles the selection state of a stock
   const toggleSelectStock = (symbol) => {
     const selectedCount = portfolio.filter(stock => stock.selected).length;
@@ -90,11 +95,6 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
     setSelectedStocks(selectedStocks => selectedStocks.filter(stock => stock.symbol !== symbol));
   };
 
-  // Sets the selected stock for detailed view
-  const handleStockClick = (symbol) => {
-    setSelectedStock(symbol);
-  };
-
   // Function to handle adding stock to portfolio from StockDetails component
   const handleAddToPortfolio = (symbol) => {
     addStockToPortfolio(symbol);
@@ -106,45 +106,74 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
   };
 
   return (
-    <Box p={5} maxWidth="800px" mx="auto">
-      <Heading mb={4}>Stock Price Lookup</Heading>
-      <Input
-        value={symbol}
-        onChange={handleInputChange}
-        placeholder="Enter stock symbol"
-        mb={4}
-      />
-      {loading && <Spinner />}
-      {error && (
-        <Alert status="error" mb={4}>
-          <AlertIcon />
-          {error}
-        </Alert>
-      )}
-      {suggestions.length > 0 && (
-        <List spacing={3}>
-          {suggestions.map((s) => (
-            <ListItem key={s.symbol} display="flex" justifyContent="space-between" alignItems="center">
-              {s.symbol} - {s.name}
-              <Button onClick={() => handleStockClick(s.symbol)} colorScheme="teal" size="sm">View Details</Button>
-              <Button onClick={() => addStockToPortfolio(s.symbol)} colorScheme="teal" size="sm" ml={2}>Add</Button>
-            </ListItem>
-          ))}
-        </List>
-      )}
-      <Portfolio 
-        portfolio={portfolio}
-        toggleSelectStock={toggleSelectStock}
-        removeStockFromPortfolio={removeStockFromPortfolio}
-      />
-      {selectedStock && (
-        <StockDetails
-          selectedStock={selectedStock}
-          onAddToPortfolio={handleAddToPortfolio}
-          onRemoveFromPortfolio={handleRemoveFromPortfolio}
-          isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
+    <Box p={5} maxWidth="1200px" mx="auto" display="flex">
+      <Box flex="1" maxWidth="300px" mr={5} bg="gray.50" p={4} borderRadius="md" borderColor="teal.400" borderWidth="1px">
+        <Portfolio 
+          portfolio={portfolio}
+          toggleSelectStock={toggleSelectStock}
+          removeStockFromPortfolio={removeStockFromPortfolio}
         />
-      )}
+      </Box>
+      <Box flex="2">
+        <Heading mb={4} color="teal.600">Stock Price Lookup</Heading>
+        <Input
+          value={symbol}
+          onChange={handleInputChange}
+          placeholder="Enter stock symbol"
+          mb={4}
+          borderColor="teal.400"
+          focusBorderColor="teal.500"
+        />
+        {loading && <Spinner color="teal.500" />}
+        {error && (
+          <Alert status="error" mb={4} borderRadius="md">
+            <AlertIcon />
+            {error}
+          </Alert>
+        )}
+        {suggestions.length > 0 && (
+          <Box maxHeight="150px" overflowY="auto" mb={4} border="1px solid lightgray" borderRadius="md">
+            <List spacing={3}>
+              {suggestions.map((s, index) => (
+                <ListItem 
+                  key={s.symbol} 
+                  display="flex" 
+                  justifyContent="space-between" 
+                  alignItems="center"
+                  onClick={() => handleStockClick(s.symbol)}
+                  bg={index % 2 === 0 ? 'gray.50' : 'white'}
+                  borderBottom="1px solid lightgray"
+                  p={2}
+                  cursor="pointer"
+                  _hover={{ bg: 'teal.50' }}
+                >
+                  {s.symbol} - {s.name}
+                  <Button 
+                    onClick={(e) => { e.stopPropagation(); addStockToPortfolio(s.symbol); }} 
+                    colorScheme="teal" 
+                    size="sm" 
+                    variant="outline"
+                  >
+                    Add
+                  </Button>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        )}
+        {selectedStock && (
+          <StockDetails
+            selectedStock={selectedStock}
+            onAddToPortfolio={handleAddToPortfolio}
+            onRemoveFromPortfolio={handleRemoveFromPortfolio}
+            isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
+          />
+        )}
+        <Box mt={6}>
+          {/* Stock comparison section remains here */}
+          {/* Add your stock comparison code here */}
+        </Box>
+      </Box>
     </Box>
   );
 };
