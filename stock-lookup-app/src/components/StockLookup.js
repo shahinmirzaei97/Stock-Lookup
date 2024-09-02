@@ -106,8 +106,8 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
   };
 
   return (
-    <Box p={5} maxWidth="1200px" mx="auto" display="flex">
-      <Box flex="1" maxWidth="300px" mr={5} bg="gray.50" p={4} borderRadius="md" borderColor="teal.400" borderWidth="1px">
+    <Box p={6} maxWidth="1200px" mx="auto" display="flex" flexDirection={{ base: 'column', md: 'row' }}>
+      <Box maxWidth="300px" mr={{ md: 5 }} bg="gray.50" p={5} borderRadius="md" borderColor="teal.500" borderWidth="2px" boxShadow="lg">
         <Portfolio 
           portfolio={portfolio}
           toggleSelectStock={toggleSelectStock}
@@ -115,24 +115,26 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
         />
       </Box>
       <Box flex="2">
-        <Heading mb={4} color="teal.600">Stock Price Lookup</Heading>
+        <Heading mb={5} color="teal.700" fontSize="2xl" textAlign="center">Stock Price Lookup</Heading>
         <Input
           value={symbol}
           onChange={handleInputChange}
           placeholder="Enter stock symbol"
           mb={4}
-          borderColor="teal.400"
-          focusBorderColor="teal.500"
+          borderColor="teal.500"
+          focusBorderColor="teal.600"
+          boxShadow="sm"
+          _hover={{ borderColor: 'teal.600' }}
         />
-        {loading && <Spinner color="teal.500" />}
+        {loading && <Spinner color="teal.600" size="lg" />}
         {error && (
-          <Alert status="error" mb={4} borderRadius="md">
+          <Alert status="error" mb={4} borderRadius="md" boxShadow="lg">
             <AlertIcon />
             {error}
           </Alert>
         )}
         {suggestions.length > 0 && (
-          <Box maxHeight="150px" overflowY="auto" mb={4} border="1px solid lightgray" borderRadius="md">
+          <Box maxHeight="150px" overflowY="auto" mb={4} border="1px solid teal.100" borderRadius="md" boxShadow="sm">
             <List spacing={3}>
               {suggestions.map((s, index) => (
                 <ListItem 
@@ -141,18 +143,19 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
                   justifyContent="space-between" 
                   alignItems="center"
                   onClick={() => handleStockClick(s.symbol)}
-                  bg={index % 2 === 0 ? 'gray.50' : 'white'}
-                  borderBottom="1px solid lightgray"
+                  bg={index % 2 === 0 ? 'teal.50' : 'white'}
+                  borderBottom="1px solid teal.100"
                   p={2}
                   cursor="pointer"
-                  _hover={{ bg: 'teal.50' }}
+                  _hover={{ bg: 'teal.100' }}
                 >
                   {s.symbol} - {s.name}
                   <Button 
                     onClick={(e) => { e.stopPropagation(); addStockToPortfolio(s.symbol); }} 
                     colorScheme="teal" 
                     size="sm" 
-                    variant="outline"
+                    variant="solid"
+                    boxShadow="sm"
                   >
                     Add
                   </Button>
@@ -162,17 +165,16 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
           </Box>
         )}
         {selectedStock && (
-          <StockDetails
-            selectedStock={selectedStock}
-            onAddToPortfolio={handleAddToPortfolio}
-            onRemoveFromPortfolio={handleRemoveFromPortfolio}
-            isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
-          />
+          <Box mt={6} bg="gray.50" p={5} borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md">
+            <StockDetails
+              selectedStock={selectedStock}
+              onAddToPortfolio={handleAddToPortfolio}
+              onRemoveFromPortfolio={handleRemoveFromPortfolio}
+              isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
+            />
+          </Box>
         )}
-        <Box mt={6}>
-          {/* Stock comparison section remains here */}
-          {/* Add your stock comparison code here */}
-        </Box>
+        
       </Box>
     </Box>
   );
