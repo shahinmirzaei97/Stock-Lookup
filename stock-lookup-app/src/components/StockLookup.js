@@ -107,13 +107,24 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
 
   return (
     <Box p={6} maxWidth="1200px" mx="auto" display="flex" flexDirection={{ base: 'column', md: 'row' }}>
-      <Box maxWidth="300px" mr={{ md: 5 }} bg="gray.50" p={5} borderRadius="md" borderColor="teal.500" borderWidth="2px" boxShadow="lg">
-        <Portfolio 
-          portfolio={portfolio}
-          toggleSelectStock={toggleSelectStock}
-          removeStockFromPortfolio={removeStockFromPortfolio}
-        />
-      </Box>
+  <Box
+    width="300px" // Static width
+    height="400px" // Static height
+    mr={{ md: 5 }}
+    bg="gray.50"
+    p={5}
+    borderRadius="md"
+    borderColor="teal.500"
+    borderWidth="2px"
+    boxShadow="lg"
+    overflowY="auto" // Allows scrolling if content overflows
+  >
+    <Portfolio 
+      portfolio={portfolio}
+      toggleSelectStock={toggleSelectStock}
+      removeStockFromPortfolio={removeStockFromPortfolio}
+    />
+  </Box>
       <Box flex="2">
         <Heading mb={5} color="teal.700" fontSize="2xl" textAlign="center">Stock Price Lookup</Heading>
         <Input
