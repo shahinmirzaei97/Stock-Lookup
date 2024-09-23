@@ -1,7 +1,7 @@
 // src/components/StockDetails.js
 import React, { useEffect, useState } from 'react';
 import { Box, Heading, Text, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
-import StockGraph from './StockGraph'; // Import the graph component
+import StockGraph from './StockGraph';
 
 const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, isInPortfolio }) => {
   const [stockDetails, setStockDetails] = useState(null);
@@ -14,12 +14,10 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
       setLoading(true);
       setError(null);
       try {
-        // Fetch detailed stock information
         const detailsResponse = await fetch(`https://financialmodelingprep.com/api/v3/profile/${selectedStock}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
         if (!detailsResponse.ok) throw new Error('Network response was not ok');
         const detailsData = await detailsResponse.json();
 
-        // Fetch historical price data for the graph
         const graphResponse = await fetch(`https://financialmodelingprep.com/api/v3/historical-price-full/${selectedStock}?serietype=line&apikey=${process.env.REACT_APP_FMP_API_KEY}`);
         if (!graphResponse.ok) throw new Error('Network response was not ok');
         const graphData = await graphResponse.json();
@@ -37,7 +35,7 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
   }, [selectedStock]);
 
   return (
-    <Box p={5} bg="gray.50" borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md" height="100%" overflowY="auto">
+    <Box p={5} bg="gray.50" borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md">
       {loading && <Spinner color="teal.600" />}
       {error && (
         <Alert status="error" mb={4} borderRadius="md" boxShadow="lg">
