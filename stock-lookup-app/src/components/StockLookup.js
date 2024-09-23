@@ -1,28 +1,26 @@
 // src/components/StockLookup.js
 import React, { useState } from 'react';
 import { Box, Input, List, ListItem, Heading, Spinner, Alert, AlertIcon, Button } from '@chakra-ui/react';
-import Portfolio from './Portfolio'; // Import the renamed Portfolio component
-import StockDetails from './StockDetails'; // Import the StockDetails component
+import Portfolio from './Portfolio';
+import StockDetails from './StockDetails';
 
 const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
-  const [symbol, setSymbol] = useState(''); // Manages the input field value for stock symbols
-  const [suggestions, setSuggestions] = useState([]); // Stores stock symbol suggestions based on user input
-  const [loading, setLoading] = useState(false); // Indicates whether data is being loaded
-  const [error, setError] = useState(null); // Stores any errors that occur during data fetching
-  const [selectedStock, setSelectedStock] = useState(null); // Manages the currently selected stock for detailed view
+  const [symbol, setSymbol] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedStock, setSelectedStock] = useState(null);
 
-  // Handles changes in the input field
   const handleInputChange = (event) => {
     const input = event.target.value.toUpperCase();
     setSymbol(input);
     if (input.length >= 2) {
-      fetchSuggestions(input); // Fetch stock suggestions when input length is 2 or more
+      fetchSuggestions(input);
     } else {
-      setSuggestions([]); // Clear suggestions if input length is less than 2
+      setSuggestions([]);
     }
   };
 
-  // Fetches stock symbol suggestions from the API
   const fetchSuggestions = async (query) => {
     setLoading(true);
     setError(null);
@@ -32,15 +30,14 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setSuggestions(data); // Set the fetched suggestions
+      setSuggestions(data);
     } catch (err) {
-      setError(err.message); // Set the error message if fetching fails
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Adds a stock to the portfolio
   const addStockToPortfolio = async (ticker) => {
     setLoading(true);
     setError(null);
@@ -59,23 +56,21 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
         selected: false,
       };
       if (!portfolio.find(stock => stock.symbol === newStock.symbol)) {
-        setPortfolio([...portfolio, newStock]); // Add the stock to the portfolio if it does not already exist
+        setPortfolio([...portfolio, newStock]);
       }
-      setSymbol(''); // Clear the input field
-      setSuggestions([]); // Clear the suggestions list
+      setSymbol('');
+      setSuggestions([]);
     } catch (err) {
-      setError(err.message); // Set the error message if adding stock fails
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sets the selected stock for detailed view
   const handleStockClick = (symbol) => {
     setSelectedStock(symbol);
   };
 
-  // Toggles the selection state of a stock
   const toggleSelectStock = (symbol) => {
     const selectedCount = portfolio.filter(stock => stock.selected).length;
     const updatedPortfolio = portfolio.map(stock =>
@@ -85,46 +80,35 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
           ? stock 
           : { ...stock, selected: false }
     );
-    setPortfolio(updatedPortfolio); // Update the portfolio with the new selection state
-    setSelectedStocks(updatedPortfolio.filter(stock => stock.selected)); // Update selected stocks for comparison
+    setPortfolio(updatedPortfolio);
+    setSelectedStocks(updatedPortfolio.filter(stock => stock.selected));
   };
 
-  // Remove a stock from the portfolio
   const removeStockFromPortfolio = (symbol) => {
     setPortfolio(portfolio.filter(stock => stock.symbol !== symbol));
     setSelectedStocks(selectedStocks => selectedStocks.filter(stock => stock.symbol !== symbol));
   };
 
-  // Function to handle adding stock to portfolio from StockDetails component
-  const handleAddToPortfolio = (symbol) => {
-    addStockToPortfolio(symbol);
-  };
-
-  // Function to handle removing stock from portfolio from StockDetails component
-  const handleRemoveFromPortfolio = (symbol) => {
-    removeStockFromPortfolio(symbol);
-  };
-
   return (
     <Box p={6} maxWidth="1200px" mx="auto" display="flex" flexDirection={{ base: 'column', md: 'row' }}>
-  <Box
-    width="300px" // Static width
-    height="400px" // Static height
-    mr={{ md: 5 }}
-    bg="gray.50"
-    p={5}
-    borderRadius="md"
-    borderColor="teal.500"
-    borderWidth="2px"
-    boxShadow="lg"
-    overflowY="auto" // Allows scrolling if content overflows
-  >
-    <Portfolio 
-      portfolio={portfolio}
-      toggleSelectStock={toggleSelectStock}
-      removeStockFromPortfolio={removeStockFromPortfolio}
-    />
-  </Box>
+      <Box
+        width="300px"
+        height="400px"
+        mr={{ md: 5 }}
+        bg="gray.50"
+        p={5}
+        borderRadius="md"
+        borderColor="teal.500"
+        borderWidth="2px"
+        boxShadow="lg"
+        overflowY="auto"
+      >
+        <Portfolio 
+          portfolio={portfolio}
+          toggleSelectStock={toggleSelectStock}
+          removeStockFromPortfolio={removeStockFromPortfolio}
+        />
+      </Box>
       <Box flex="2">
         <Heading mb={5} color="teal.700" fontSize="2xl" textAlign="center">Stock Price Lookup</Heading>
         <Input
@@ -179,13 +163,12 @@ const StockLookup = ({ portfolio, setPortfolio, setSelectedStocks }) => {
           <Box mt={6} bg="gray.50" p={5} borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md">
             <StockDetails
               selectedStock={selectedStock}
-              onAddToPortfolio={handleAddToPortfolio}
-              onRemoveFromPortfolio={handleRemoveFromPortfolio}
+              onAddToPortfolio={addStockToPortfolio}
+              onRemoveFromPortfolio={removeStockFromPortfolio}
               isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
             />
           </Box>
         )}
-        
       </Box>
     </Box>
   );
