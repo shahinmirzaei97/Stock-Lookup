@@ -55,7 +55,7 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
       {selectedStocks.length === 2 && stockDetails.length === 2 ? (
         <Box>
           <Heading size="md" mb={4} textAlign="center">
-            Comparing {selectedStocks[0]} and {selectedStocks[1]}
+            Comparing {stockDetails[0].companyName} and {stockDetails[1].companyName}
           </Heading>
           <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={6}>
             {stockDetails.map(stock => (
@@ -71,7 +71,7 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
                 <Button
                   colorScheme="teal"
                   alignSelf="center"
-                  mt="auto" // Ensure button stays at the bottom regardless of content height
+                  mt="auto"
                   onClick={() => setSelectedStock(stock.symbol)}
                 >
                   View Stock Details

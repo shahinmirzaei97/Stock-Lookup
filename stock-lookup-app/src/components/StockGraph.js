@@ -1,7 +1,7 @@
 // src/components/StockGraph.js
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Box, FormControl, FormLabel, Select as ChakraSelect, Flex } from '@chakra-ui/react';
+import { Box, FormControl, FormLabel, Button, Flex } from '@chakra-ui/react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -68,8 +68,6 @@ const StockGraph = ({ symbols }) => {
         return 7;
       case '1M':
         return 30;
-      case '3M':
-        return 90;
       case '1Y':
         return 365;
       case '5Y':
@@ -79,27 +77,66 @@ const StockGraph = ({ symbols }) => {
     }
   };
 
+  const handleDateRangeClick = (range) => {
+    setDateRange(range);
+  };
+
   return (
     <Box>
-      <Flex mb={4} alignItems="center" gap={4} wrap="wrap">
-        {/* Date Range Selection */}
-        <FormControl width="180px">
-          <FormLabel>Select Date Range</FormLabel>
-          <ChakraSelect value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
-            <option value="1D">Last Day</option>
-            <option value="1W">Last Week</option>
-            <option value="1M">Last Month</option>
-            <option value="3M">Last Quarter</option>
-            <option value="1Y">Last Year</option>
-            <option value="5Y">Last 5 Years</option>
-            <option value="custom">Custom</option>
-          </ChakraSelect>
-        </FormControl>
+      {/* Date Range Selection - Predefined Options */}
+      <FormControl mb={4}>
+        <FormLabel>Date Range Selection</FormLabel>
+        <Flex gap={2} wrap="wrap">
+          <Button
+            size="sm"
+            colorScheme={dateRange === '1D' ? 'teal' : 'gray'}
+            onClick={() => handleDateRangeClick('1D')}
+          >
+            Last Day
+          </Button>
+          <Button
+            size="sm"
+            colorScheme={dateRange === '1W' ? 'teal' : 'gray'}
+            onClick={() => handleDateRangeClick('1W')}
+          >
+            Last Week
+          </Button>
+          <Button
+            size="sm"
+            colorScheme={dateRange === '1M' ? 'teal' : 'gray'}
+            onClick={() => handleDateRangeClick('1M')}
+          >
+            Last Month
+          </Button>
+          <Button
+            size="sm"
+            colorScheme={dateRange === '1Y' ? 'teal' : 'gray'}
+            onClick={() => handleDateRangeClick('1Y')}
+          >
+            Last Year
+          </Button>
+          <Button
+            size="sm"
+            colorScheme={dateRange === '5Y' ? 'teal' : 'gray'}
+            onClick={() => handleDateRangeClick('5Y')}
+          >
+            Last 5 Years
+          </Button>
+        </Flex>
+      </FormControl>
 
-        {/* Custom Date Picker - Visible Only When Custom Date Range is Selected */}
-        {dateRange === 'custom' && (
-          <FormControl>
-            <FormLabel>Custom Date Range</FormLabel>
+      {/* Custom Date Range Button */}
+      <FormControl mb={4}>
+        <Flex alignItems="center" gap={2}>
+          <Button
+            size="sm"
+            colorScheme={dateRange === 'custom' ? 'teal' : 'gray'}
+            onClick={() => handleDateRangeClick('custom')}
+          >
+            Custom
+          </Button>
+          {/* Custom Date Picker - Visible Only When Custom Date Range is Selected */}
+          {dateRange === 'custom' && (
             <Flex gap={2} alignItems="center">
               <DatePicker
                 selected={startDate}
@@ -123,10 +160,11 @@ const StockGraph = ({ symbols }) => {
                 className="custom-datepicker"
               />
             </Flex>
-          </FormControl>
-        )}
-      </Flex>
+          )}
+        </Flex>
+      </FormControl>
 
+      {/* Line Chart for Stock Data */}
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={graphData}
