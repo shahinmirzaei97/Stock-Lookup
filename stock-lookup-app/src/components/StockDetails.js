@@ -5,7 +5,6 @@ import StockGraph from './StockGraph'; // Import the graph component
 
 const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, isInPortfolio }) => {
   const [stockDetails, setStockDetails] = useState(null);
-  const [graphData, setGraphData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,13 +18,7 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
         if (!detailsResponse.ok) throw new Error('Network response was not ok');
         const detailsData = await detailsResponse.json();
 
-        // Fetch historical price data for the graph
-        const graphResponse = await fetch(`https://financialmodelingprep.com/api/v3/historical-price-full/${selectedStock}?serietype=line&apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-        if (!graphResponse.ok) throw new Error('Network response was not ok');
-        const graphData = await graphResponse.json();
-
         setStockDetails(detailsData[0]);
-        setGraphData(graphData.historical);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -56,7 +49,7 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
           <Text><strong>Description:</strong> {stockDetails.description}</Text>
 
           {/* Display the stock graph */}
-          <Box mt={4}>
+          <Box mt={4} height="300px" overflowY="hidden">
             <StockGraph symbols={[selectedStock]} />
           </Box>
 
