@@ -1,9 +1,9 @@
 // src/components/StockComparison.js
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, Grid, GridItem, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Heading, Text, Grid, GridItem, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
 
-const StockComparison = ({ selectedStocks }) => {
+const StockComparison = ({ selectedStocks, setSelectedStock }) => {
   const [stockDetails, setStockDetails] = useState([]); // State to store details of selected stocks
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,8 +42,8 @@ const StockComparison = ({ selectedStocks }) => {
   }, [selectedStocks]);
 
   return (
-    <Box p={5} mt={8} maxWidth="800px" mx="auto">
-      <Heading size="lg" mb={4}>Stock Comparison</Heading>
+    <Box p={5} mt={8} maxWidth="800px" mx="auto" textAlign="center">
+      <Heading size="lg" mb={4} textAlign="center">Stock Comparison</Heading>
 
       {loading && <Spinner color="teal.600" size="lg" />}
       {error && (
@@ -54,7 +54,7 @@ const StockComparison = ({ selectedStocks }) => {
       )}
       {selectedStocks.length === 2 && stockDetails.length === 2 ? (
         <Box>
-          <Heading size="md" mb={4}>
+          <Heading size="md" mb={4} textAlign="center">
             Comparing {selectedStocks[0]} and {selectedStocks[1]}
           </Heading>
           <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={6}>
@@ -66,6 +66,13 @@ const StockComparison = ({ selectedStocks }) => {
                 <Text><strong>Industry:</strong> {stock.industry}</Text>
                 <Text><strong>Sector:</strong> {stock.sector}</Text>
                 <Text><strong>CEO:</strong> {stock.ceo}</Text>
+                <Button
+                  mt={4}
+                  colorScheme="teal"
+                  onClick={() => setSelectedStock(stock.symbol)}
+                >
+                  View Stock Details
+                </Button>
               </GridItem>
             ))}
           </Grid>

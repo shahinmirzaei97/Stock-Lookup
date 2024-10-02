@@ -11,27 +11,6 @@ const App = () => {
   const [selectedStocks, setSelectedStocks] = useState([]); // State to manage selected stocks for comparison
   const [selectedStock, setSelectedStock] = useState(null); // State to manage the selected stock for details
 
-  // Function to toggle the selection state of a stock for comparison
-  const toggleSelectStock = (symbol) => {
-    setPortfolio((prevPortfolio) => {
-      return prevPortfolio.map(stock =>
-        stock.symbol === symbol ? { ...stock, selected: !stock.selected } : stock
-      );
-    });
-
-    setSelectedStocks((prevSelectedStocks) => {
-      if (prevSelectedStocks.includes(symbol)) {
-        // Remove the stock from selected stocks if it was already selected
-        return prevSelectedStocks.filter(stockSymbol => stockSymbol !== symbol);
-      }
-      if (prevSelectedStocks.length < 2) {
-        // Add the stock to selected stocks if the limit hasn't been reached
-        return [...prevSelectedStocks, symbol];
-      }
-      return prevSelectedStocks;
-    });
-  };
-
   return (
     <ChakraProvider>
       {/* Navigation bar with the stock search */}
@@ -46,12 +25,11 @@ const App = () => {
       </Box>
 
       {/* Main content grid, positioned below the nav bar */}
-      <Box p={5} pt="120px" height="100vh" overflow="hidden"> {/* pt="120px" to account for nav height */}
+      <Box p={5} pt="120px" height="calc(100vh - 120px)" overflowY="auto"> {/* pt="120px" to account for nav height */}
         <Grid
           templateColumns="repeat(3, 1fr)"
           gap={6}
           height="100%"
-          templateRows="1fr"
         >
           {/* Portfolio Section */}
           <GridItem>
@@ -67,7 +45,7 @@ const App = () => {
               <Portfolio
                 portfolio={portfolio}
                 setPortfolio={setPortfolio}
-                toggleSelectStock={toggleSelectStock} // Pass function to toggle stock selection
+                setSelectedStocks={setSelectedStocks}
               />
             </Box>
           </GridItem>
@@ -83,7 +61,7 @@ const App = () => {
               boxShadow="md"
               overflowY="auto"
             >
-              <StockComparison selectedStocks={selectedStocks} />
+              <StockComparison selectedStocks={selectedStocks} setSelectedStock={setSelectedStock} />
             </Box>
           </GridItem>
 
