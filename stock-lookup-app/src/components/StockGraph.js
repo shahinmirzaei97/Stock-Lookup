@@ -8,14 +8,24 @@ import "react-datepicker/dist/react-datepicker.css";
 const StockGraph = ({ symbols }) => {
   const [graphData, setGraphData] = useState([]);
   const [dateRange, setDateRange] = useState('1D'); // Default to last day
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 1))); // Start default to one day before today
+  const [endDate, setEndDate] = useState(new Date()); // End default to today
 
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
+        let query = '';
+        
+        if (dateRange !== 'custom') {
+          query = `timeseries=${getDateRangeLimit(dateRange)}`;
+        } else {
+          const start = startDate.toISOString().split('T')[0];
+          const end = endDate.toISOString().split('T')[0];
+          query = `from=${start}&to=${end}`;
+        }
+
         const dataPromises = symbols.map(symbol =>
-          fetch(`https://financialmodelingprep.com/api/v3/historical-price-full/${symbol}?serietype=line&timeseries=${getDateRangeLimit(dateRange)}&apikey=${process.env.REACT_APP_FMP_API_KEY}`)
+          fetch(`https://financialmodelingprep.com/api/v3/historical-price-full/${symbol}?serietype=line&${query}&apikey=${process.env.REACT_APP_FMP_API_KEY}`)
             .then(response => response.json())
             .then(data => ({
               symbol,
@@ -71,9 +81,9 @@ const StockGraph = ({ symbols }) => {
 
   return (
     <Box>
-      <Flex mb={4} alignItems="center" gap={4}>
+      <Flex mb={4} alignItems="center" gap={4} wrap="wrap">
         {/* Date Range Selection */}
-        <FormControl width="40%">
+        <FormControl width="180px">
           <FormLabel>Select Date Range</FormLabel>
           <ChakraSelect value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
             <option value="1D">Last Day</option>
@@ -82,36 +92,39 @@ const StockGraph = ({ symbols }) => {
             <option value="3M">Last Quarter</option>
             <option value="1Y">Last Year</option>
             <option value="5Y">Last 5 Years</option>
+            <option value="custom">Custom</option>
           </ChakraSelect>
         </FormControl>
 
-        {/* Custom Date Picker */}
-        <FormControl width="60%">
-          <FormLabel>Custom Date Range</FormLabel>
-          <Flex gap={2}>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              maxDate={new Date()}
-              dateFormat="yyyy/MM/dd"
-              className="custom-datepicker"
-            />
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              minDate={startDate}
-              maxDate={new Date()}
-              dateFormat="yyyy/MM/dd"
-              className="custom-datepicker"
-            />
-          </Flex>
-        </FormControl>
+        {/* Custom Date Picker - Visible Only When Custom Date Range is Selected */}
+        {dateRange === 'custom' && (
+          <FormControl>
+            <FormLabel>Custom Date Range</FormLabel>
+            <Flex gap={2} alignItems="center">
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                selectsStart
+                startDate={startDate}
+                endDate={endDate}
+                maxDate={new Date()}
+                dateFormat="yyyy/MM/dd"
+                className="custom-datepicker"
+              />
+              <DatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                selectsEnd
+                startDate={startDate}
+                endDate={endDate}
+                minDate={startDate}
+                maxDate={new Date()}
+                dateFormat="yyyy/MM/dd"
+                className="custom-datepicker"
+              />
+            </Flex>
+          </FormControl>
+        )}
       </Flex>
 
       <ResponsiveContainer width="100%" height={300}>
