@@ -1,11 +1,15 @@
 // src/components/StockGraph.js
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Select } from 'recharts';
-import { Box, FormControl, FormLabel, Select as ChakraSelect } from '@chakra-ui/react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Box, FormControl, FormLabel, Select as ChakraSelect, Flex } from '@chakra-ui/react';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 const StockGraph = ({ symbols }) => {
   const [graphData, setGraphData] = useState([]);
   const [dateRange, setDateRange] = useState('1D'); // Default to last day
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -28,11 +32,11 @@ const StockGraph = ({ symbols }) => {
     };
 
     fetchGraphData();
-  }, [symbols, dateRange]);
+  }, [symbols, dateRange, startDate, endDate]);
 
   const mergeStockData = (results) => {
     const combinedData = [];
-    if (results[0].historical.length > 0) {
+    if (results[0]?.historical?.length > 0) {
       results[0].historical.forEach((entry) => {
         const date = entry.date;
         const dataPoint = { date };
@@ -67,17 +71,48 @@ const StockGraph = ({ symbols }) => {
 
   return (
     <Box>
-      <FormControl mb={4}>
-        <FormLabel>Select Date Range</FormLabel>
-        <ChakraSelect value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
-          <option value="1D">Last Day</option>
-          <option value="1W">Last Week</option>
-          <option value="1M">Last Month</option>
-          <option value="3M">Last Quarter</option>
-          <option value="1Y">Last Year</option>
-          <option value="5Y">Last 5 Years</option>
-        </ChakraSelect>
-      </FormControl>
+      <Flex mb={4} alignItems="center" gap={4}>
+        {/* Date Range Selection */}
+        <FormControl width="40%">
+          <FormLabel>Select Date Range</FormLabel>
+          <ChakraSelect value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+            <option value="1D">Last Day</option>
+            <option value="1W">Last Week</option>
+            <option value="1M">Last Month</option>
+            <option value="3M">Last Quarter</option>
+            <option value="1Y">Last Year</option>
+            <option value="5Y">Last 5 Years</option>
+          </ChakraSelect>
+        </FormControl>
+
+        {/* Custom Date Picker */}
+        <FormControl width="60%">
+          <FormLabel>Custom Date Range</FormLabel>
+          <Flex gap={2}>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              maxDate={new Date()}
+              dateFormat="yyyy/MM/dd"
+              className="custom-datepicker"
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              maxDate={new Date()}
+              dateFormat="yyyy/MM/dd"
+              className="custom-datepicker"
+            />
+          </Flex>
+        </FormControl>
+      </Flex>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart

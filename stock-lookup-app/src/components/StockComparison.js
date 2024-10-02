@@ -59,16 +59,19 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
           </Heading>
           <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={6}>
             {stockDetails.map(stock => (
-              <GridItem key={stock.symbol} border="1px solid #ccc" borderRadius="md" p={4}>
-                <Heading size="md" mb={2}>{stock.companyName}</Heading>
-                <Text><strong>Symbol:</strong> {stock.symbol}</Text>
-                <Text><strong>Price:</strong> ${stock.price}</Text>
-                <Text><strong>Industry:</strong> {stock.industry}</Text>
-                <Text><strong>Sector:</strong> {stock.sector}</Text>
-                <Text><strong>CEO:</strong> {stock.ceo}</Text>
+              <GridItem key={stock.symbol} border="1px solid #ccc" borderRadius="md" p={4} display="flex" flexDirection="column" justifyContent="space-between">
+                <Box mb={4}>
+                  <Heading size="md" mb={2}>{stock.companyName}</Heading>
+                  <Text><strong>Symbol:</strong> {stock.symbol}</Text>
+                  <Text><strong>Price:</strong> ${stock.price}</Text>
+                  <Text><strong>Industry:</strong> {stock.industry}</Text>
+                  <Text><strong>Sector:</strong> {stock.sector}</Text>
+                  <Text><strong>CEO:</strong> {stock.ceo}</Text>
+                </Box>
                 <Button
-                  mt={4}
                   colorScheme="teal"
+                  alignSelf="center"
+                  mt="auto" // Ensure button stays at the bottom regardless of content height
                   onClick={() => setSelectedStock(stock.symbol)}
                 >
                   View Stock Details

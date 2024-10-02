@@ -11,6 +11,27 @@ const App = () => {
   const [selectedStocks, setSelectedStocks] = useState([]); // State to manage selected stocks for comparison
   const [selectedStock, setSelectedStock] = useState(null); // State to manage the selected stock for details
 
+  // Function to toggle the selection state of a stock for comparison
+  const toggleSelectStock = (symbol) => {
+    setPortfolio((prevPortfolio) => {
+      return prevPortfolio.map(stock =>
+        stock.symbol === symbol ? { ...stock, selected: !stock.selected } : stock
+      );
+    });
+
+    setSelectedStocks((prevSelectedStocks) => {
+      if (prevSelectedStocks.includes(symbol)) {
+        // Remove the stock from selected stocks if it was already selected
+        return prevSelectedStocks.filter(stockSymbol => stockSymbol !== symbol);
+      }
+      if (prevSelectedStocks.length < 2) {
+        // Add the stock to selected stocks if the limit hasn't been reached
+        return [...prevSelectedStocks, symbol];
+      }
+      return prevSelectedStocks;
+    });
+  };
+
   return (
     <ChakraProvider>
       {/* Navigation bar with the stock search */}
@@ -25,7 +46,7 @@ const App = () => {
       </Box>
 
       {/* Main content grid, positioned below the nav bar */}
-      <Box p={5} pt="120px" height="calc(100vh - 120px)" overflowY="auto"> {/* pt="120px" to account for nav height */}
+      <Box p={5} pt="120px" height="calc(100vh - 120px)" overflowY="auto">
         <Grid
           templateColumns="repeat(3, 1fr)"
           gap={6}
@@ -45,7 +66,7 @@ const App = () => {
               <Portfolio
                 portfolio={portfolio}
                 setPortfolio={setPortfolio}
-                setSelectedStocks={setSelectedStocks}
+                toggleSelectStock={toggleSelectStock} // Pass toggleSelectStock to Portfolio
               />
             </Box>
           </GridItem>
@@ -81,6 +102,13 @@ const App = () => {
                   selectedStock={selectedStock}
                   setPortfolio={setPortfolio}
                   portfolio={portfolio}
+                  isInPortfolio={portfolio.some(stock => stock.symbol === selectedStock)}
+                  onAddToPortfolio={(symbol) => {
+                    setPortfolio([...portfolio, { symbol, price: 0, quantity: 1 }]); // Add a new stock (default price to 0)
+                  }}
+                  onRemoveFromPortfolio={(symbol) => {
+                    setPortfolio(portfolio.filter(stock => stock.symbol !== symbol));
+                  }}
                 />
               ) : (
                 <Box textAlign="center" color="gray.500" mt={10}>
