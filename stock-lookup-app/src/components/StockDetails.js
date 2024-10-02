@@ -39,7 +39,7 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
         </Alert>
       )}
       {stockDetails && (
-        <Box>
+        <Box height="100%" overflowY="auto" display="flex" flexDirection="column">
           <Heading size="lg" mb={4} color="teal.700">{stockDetails.companyName}</Heading>
           <Text><strong>Symbol:</strong> {stockDetails.symbol}</Text>
           <Text><strong>Price:</strong> ${stockDetails.price}</Text>
@@ -49,7 +49,7 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
           <Text><strong>Description:</strong> {stockDetails.description}</Text>
 
           {/* Display the stock graph */}
-          <Box mt={4} height="300px" overflowY="hidden">
+          <Box mt={4} flex="1 1 auto">
             <StockGraph symbols={[selectedStock]} />
           </Box>
 

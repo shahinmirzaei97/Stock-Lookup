@@ -1,39 +1,61 @@
 // src/components/StockComparison.js
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, Grid, GridItem } from '@chakra-ui/react';
+import { Box, Heading, Text, Grid, GridItem, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
 
 const StockComparison = ({ selectedStocks }) => {
   const [stockDetails, setStockDetails] = useState([]); // State to store details of selected stocks
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchStockDetails = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const detailsPromises = selectedStocks.map(stock =>
-          fetch(`https://financialmodelingprep.com/api/v3/profile/${stock.symbol}?apikey=${process.env.REACT_APP_FMP_API_KEY}`)
-            .then(response => response.json())
-            .then(data => data[0]) // Extract the first item from the response array
+          fetch(`https://financialmodelingprep.com/api/v3/profile/${stock}?apikey=${process.env.REACT_APP_FMP_API_KEY}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => (data.length > 0 ? data[0] : null)) // Extract the first item from the response array
         );
 
         const details = await Promise.all(detailsPromises);
-        setStockDetails(details);
+        const validDetails = details.filter(detail => detail !== null); // Filter out any null responses
+        setStockDetails(validDetails);
       } catch (error) {
-        console.error('Error fetching stock details:', error);
+        setError('Error fetching stock details for comparison. Please try again.');
+      } finally {
+        setLoading(false);
       }
     };
 
     if (selectedStocks.length === 2) {
       fetchStockDetails(); // Fetch details when two stocks are selected
+    } else {
+      setStockDetails([]); // Clear stock details if less than two stocks are selected
     }
   }, [selectedStocks]);
 
   return (
     <Box p={5} mt={8} maxWidth="800px" mx="auto">
       <Heading size="lg" mb={4}>Stock Comparison</Heading>
-      {selectedStocks.length === 2 ? (
+
+      {loading && <Spinner color="teal.600" size="lg" />}
+      {error && (
+        <Alert status="error" mb={4} borderRadius="md" boxShadow="lg">
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
+      {selectedStocks.length === 2 && stockDetails.length === 2 ? (
         <Box>
           <Heading size="md" mb={4}>
-            Comparing {selectedStocks[0].symbol} and {selectedStocks[1].symbol}
+            Comparing {selectedStocks[0]} and {selectedStocks[1]}
           </Heading>
           <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={6}>
             {stockDetails.map(stock => (
@@ -47,7 +69,7 @@ const StockComparison = ({ selectedStocks }) => {
               </GridItem>
             ))}
           </Grid>
-          <StockGraph symbols={[selectedStocks[0].symbol, selectedStocks[1].symbol]} />
+          <StockGraph symbols={selectedStocks} />
         </Box>
       ) : (
         <Text>Select two stocks to compare.</Text>
