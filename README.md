@@ -16,17 +16,3 @@
 - **Data Fetching**: Native Fetch API
 - **Styling**: Custom CSS with a cohesive color scheme
 
-## Installation
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/username/stocklookup-app.git
-2. Change into project directory:
-   ```bash
-   cd stocklookup-app
-3. Install the required dependencies using NPM
-   ```bash
-   npm install
-4. Start the application
-   ```bash
-   npm start 
