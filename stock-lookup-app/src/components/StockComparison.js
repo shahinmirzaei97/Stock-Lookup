@@ -1,4 +1,4 @@
-// src/components/StockComparison.js
+//  src/components/StockComparison.js
 import React, { useEffect, useState } from 'react';
 import { Box, Heading, Text, Grid, GridItem, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
