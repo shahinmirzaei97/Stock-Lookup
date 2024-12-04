@@ -11,23 +11,28 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
 
   // Debounced function to fetch stock suggestions
   const fetchSuggestions = useCallback(
-    debounce(async (query) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch suggestions');
+    debounce(
+      async (query) => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch(
+            `https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&apikey=${process.env.REACT_APP_FMP_API_KEY}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch suggestions");
+          }
+          const data = await response.json();
+          setSuggestions(data); // Set suggestions from API response
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
         }
-        const data = await response.json();
-        setSuggestions(data); // Set suggestions from API response
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }, 500), // 500ms delay for debounce
-    []
+      },
+      500 // 500ms delay for debounce
+    ),
+    [setLoading, setError, setSuggestions] // Include necessary dependencies
   );
 
   // Handle input change
