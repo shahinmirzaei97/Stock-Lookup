@@ -1,0 +1,4 @@
+[[redirects]]
+  from = "/*"
+  to = "https://shahinmirzaei.dev/stocklookupapp"
+  status = 301
