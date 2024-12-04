@@ -1,5 +1,5 @@
 // src/components/StockLookup.js
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Input, Box, List, ListItem, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import { debounce } from '../utils/debounce';
 
@@ -10,9 +10,9 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
   const [error, setError] = useState(null); // Track errors
 
   // Debounced function to fetch stock suggestions
-  const fetchSuggestions = useCallback(
-    debounce(
-      async (query) => {
+  const debouncedFetch = useMemo(
+    () =>
+      debounce(async (query) => {
         setLoading(true);
         setError(null);
         try {
@@ -23,18 +23,23 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
             throw new Error("Failed to fetch suggestions");
           }
           const data = await response.json();
-          setSuggestions(data); // Set suggestions from API response
+          setSuggestions(data);
         } catch (err) {
           setError(err.message);
         } finally {
           setLoading(false);
         }
-      },
-      500 // 500ms delay for debounce
-    ),
-    [setLoading, setError, setSuggestions] // Include necessary dependencies
+      }, 500),
+    [setLoading, setError, setSuggestions]
   );
-
+  
+  const fetchSuggestions = useCallback(
+    (query) => {
+      debouncedFetch(query);
+    },
+    [debouncedFetch]
+  );
+  
   // Handle input change
   const handleInputChange = (event) => {
     const input = event.target.value.toUpperCase();
