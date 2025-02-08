@@ -2,6 +2,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Input, Box, List, ListItem, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import { debounce } from '../utils/debounce';
+import { addStockToPortfolio} from '../utils/portfolioUtils';
 
 const StockLookup = ({ setPortfolio, setSelectedStock }) => {
   const [symbol, setSymbol] = useState(''); // Track the input value
@@ -59,29 +60,10 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
   };
 
   // Handle adding stock to portfolio
-  const handleAddToPortfolio = async (symbol) => {
-    try {
-      const response = await fetch(`https://financialmodelingprep.com/api/v3/quote/${symbol}?apikey=${process.env.REACT_APP_FMP_API_KEY}`);
-      if (!response.ok) throw new Error('Failed to fetch stock price');
-      const data = await response.json();
+  const handleAddToPortfolio = (symbol) => {
+    addStockToPortfolio(symbol, setPortfolio);
+};
 
-      if (data.length > 0) {
-        const stockToAdd = {
-          symbol: data[0].symbol,
-          price: data[0].price,
-          quantity: 1,
-        };
-        setPortfolio((prevPortfolio) => {
-          if (!prevPortfolio.some(stock => stock.symbol === stockToAdd.symbol)) {
-            return [...prevPortfolio, stockToAdd];
-          }
-          return prevPortfolio;
-        });
-      }
-    } catch (error) {
-      console.error('Error adding stock to portfolio:', error.message);
-    }
-  };
 
   return (
     <Box position="relative">

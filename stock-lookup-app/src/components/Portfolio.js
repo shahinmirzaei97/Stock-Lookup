@@ -1,21 +1,31 @@
-// src/components/Portfolio.js
 import React from 'react';
-import { Box, List, ListItem, Heading, Checkbox, Button, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Text } from '@chakra-ui/react';
+import { Box, List, ListItem, Button, Heading, Text, Checkbox } from '@chakra-ui/react';
+import { NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from '@chakra-ui/react';
 
-const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, removeStockFromPortfolio }) => {
-  // Calculate the total portfolio value
-  const portfolioValue = portfolio.reduce((acc, stock) => acc + (stock.price * stock.quantity || 1), 0);
+const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock }) => {
 
-  // Function to adjust the quantity of stocks in the portfolio
-  const handleQuantityChange = (symbol, value) => {
-    const updatedPortfolio = portfolio.map(stock =>
-      stock.symbol === symbol ? { ...stock, quantity: value } : stock
+  // Calculate total portfolio value correctly
+  const portfolioValue = portfolio.reduce(
+    (sum, stock) => sum + (stock.price * stock.quantity), 
+    0
+  );
+
+  // Handle quantity changes for stocks
+  const handleQuantityChange = (symbol, quantity) => {
+    setPortfolio(prevPortfolio =>
+      prevPortfolio.map(stock =>
+        stock.symbol === symbol ? { ...stock, quantity } : stock
+      )
     );
-    setPortfolio(updatedPortfolio);
+  };
+
+  // ✅ Correctly handle removing stock from portfolio
+  const handleRemoveStock = (symbol) => {
+    setPortfolio((prevPortfolio) => prevPortfolio.filter(stock => stock.symbol !== symbol));
   };
 
   return (
-    <Box p={5} borderRadius="md" borderColor="teal.500" borderWidth="2px" boxShadow="md">
+    <Box p={5} borderRadius="md" borderColor="teal.500" borderWidth="2px" boxShadow="md" width="300px" height="400px" overflowY="auto">
       <Heading size="md" mb={3} color="teal.700">Your Portfolio</Heading>
 
       {/* Portfolio Value */}
@@ -42,11 +52,11 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, removeStockFrom
                 mr={3}
                 colorScheme="teal"
               />
-              <Box mr={3}>{stock.symbol}: ${stock.price}</Box>
+              <Box mr={3}>{stock.symbol}: ${stock.price.toFixed(2)}</Box>
 
               {/* Number of stocks (Quantity) */}
               <NumberInput
-                defaultValue={stock.quantity || 1}
+                value={stock.quantity}  // Ensure dynamic updates
                 min={1}
                 max={100}
                 onChange={(value) => handleQuantityChange(stock.symbol, Number(value))}
@@ -61,8 +71,9 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, removeStockFrom
               </NumberInput>
             </Box>
 
+            {/* ✅ Fixed Remove Stock Functionality */}
             <Button 
-              onClick={() => removeStockFromPortfolio(stock.symbol)} 
+              onClick={() => handleRemoveStock(stock.symbol)} 
               colorScheme="red" 
               size="sm"
               boxShadow="sm"

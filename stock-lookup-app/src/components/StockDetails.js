@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Heading, Text, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import StockGraph from './StockGraph'; // Import the graph component
+import { addStockToPortfolio, removeStockFromPortfolio } from '../utils/portfolioUtils';
 
-const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, isInPortfolio }) => {
+const StockDetails = ({ selectedStock, setPortfolio, isInPortfolio }) => {
   const [stockDetails, setStockDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -55,13 +56,14 @@ const StockDetails = ({ selectedStock, onAddToPortfolio, onRemoveFromPortfolio, 
 
           {/* Button to add or remove stock from the portfolio */}
           <Button
-            onClick={() => isInPortfolio ? onRemoveFromPortfolio(selectedStock) : onAddToPortfolio(selectedStock)}
-            colorScheme={isInPortfolio ? "red" : "teal"}
-            mt={4}
-            boxShadow="md"
-          >
-            {isInPortfolio ? 'Remove from Portfolio' : 'Add to Portfolio'}
-          </Button>
+        onClick={() => isInPortfolio 
+          ? removeStockFromPortfolio(selectedStock, setPortfolio) 
+          : addStockToPortfolio(selectedStock, setPortfolio)}
+        colorScheme={isInPortfolio ? "red" : "teal"}
+        mt={4}
+      >
+        {isInPortfolio ? 'Remove from Portfolio' : 'Add to Portfolio'}
+      </Button>
         </Box>
       )}
     </Box>
