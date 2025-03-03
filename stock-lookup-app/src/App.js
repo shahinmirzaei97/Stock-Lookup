@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import StockLookup from "./components/StockLookup";
 import StockComparison from "./components/StockComparison";
-import { ChakraProvider, Box, Grid, GridItem, Heading } from "@chakra-ui/react";
 import Portfolio from "./components/Portfolio";
-import StockDetails from "./components/StockDetails"; // Import the StockDetails component
+import StockDetails from "./components/StockDetails";
+import { Container, Navbar, Row, Col, Card, Button, Collapse } from "react-bootstrap";
+import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 
 const App = () => {
-  const [portfolio, setPortfolio] = useState([]); // State to manage the portfolio of stocks
-  const [selectedStocks, setSelectedStocks] = useState([]); // State to manage selected stocks for comparison
-  const [selectedStock, setSelectedStock] = useState(null); // State to manage the selected stock for details
+  const [portfolio, setPortfolio] = useState([]);
+  const [selectedStocks, setSelectedStocks] = useState([]);
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [showPortfolio, setShowPortfolio] = useState(true);
 
   // Function to fetch stock price before adding to portfolio
   const fetchStockPrice = async (symbol) => {
@@ -20,18 +22,16 @@ const App = () => {
 
       const data = await response.json();
       if (data.length > 0 && data[0].price !== undefined) {
-        return parseFloat(data[0].price); // Ensure price is correctly stored
+        return parseFloat(data[0].price);
       }
     } catch (error) {
       console.error("Error fetching stock price:", error.message);
     }
-    return 0; // Default to 0 if fetching fails
+    return 0;
   };
 
-  // Function to add a stock to the portfolio
   const onAddToPortfolio = async (symbol) => {
-    const price = await fetchStockPrice(symbol); // Fetch the correct price
-
+    const price = await fetchStockPrice(symbol);
     setPortfolio((prevPortfolio) => {
       if (!prevPortfolio.some((stock) => stock.symbol === symbol)) {
         return [...prevPortfolio, { symbol, price, quantity: 1 }];
@@ -40,81 +40,91 @@ const App = () => {
     });
   };
 
-  // Function to remove a stock from the portfolio
   const onRemoveFromPortfolio = (symbol) => {
     setPortfolio((prevPortfolio) =>
       prevPortfolio.filter((stock) => stock.symbol !== symbol)
     );
+    setSelectedStocks((prevSelected) =>
+      prevSelected.filter((s) => s !== symbol)
+    );
   };
 
-  // Function to toggle the selection state of a stock for comparison
   const toggleSelectStock = (symbol) => {
-    setPortfolio((prevPortfolio) => {
-      return prevPortfolio.map((stock) =>
-        stock.symbol === symbol ? { ...stock, selected: !stock.selected } : stock
-      );
-    });
-
-    setSelectedStocks((prevSelectedStocks) => {
-      if (prevSelectedStocks.includes(symbol)) {
-        return prevSelectedStocks.filter((stockSymbol) => stockSymbol !== symbol);
+    setSelectedStocks((prevSelected) => {
+      if (prevSelected.includes(symbol)) {
+        return prevSelected.filter((s) => s !== symbol);
       }
-      if (prevSelectedStocks.length < 2) {
-        return [...prevSelectedStocks, symbol];
+      if (prevSelected.length < 2) {
+        return [...prevSelected, symbol];
       }
-      return prevSelectedStocks;
+      return prevSelected;
     });
   };
 
   return (
-    <ChakraProvider>
-      {/* Navigation bar with the stock search */}
-      <Box p={5} bg="teal.500" color="white" position="fixed" top={0} width="100%" zIndex="1000" boxShadow="md">
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-          <Heading size="lg" mb={2}>Stock Lookup</Heading>
+    <Container fluid>
+      <Navbar bg="dark" variant="dark" className="mb-4 px-4">
+        <Navbar.Brand>Stock Lookup</Navbar.Brand>
+      </Navbar>
+      <Row className="mb-4">
+        <Col md={12}>
           <StockLookup setPortfolio={setPortfolio} setSelectedStock={setSelectedStock} />
-        </Box>
-      </Box>
-
-      {/* Main content grid, positioned below the nav bar */}
-      <Box p={5} pt="120px" height="calc(100vh - 120px)" overflowY="auto">
-        <Grid templateColumns="repeat(3, 1fr)" gap={6} height="100%">
-          {/* Portfolio Section */}
-          <GridItem>
-            <Box height="100%" p={5} borderRadius="md" borderColor="teal.500" borderWidth="2px" boxShadow="md" overflowY="auto">
-              <Portfolio portfolio={portfolio} setPortfolio={setPortfolio} toggleSelectStock={toggleSelectStock} />
-            </Box>
-          </GridItem>
-
-          {/* Stock Comparison Section */}
-          <GridItem>
-            <Box height="100%" p={5} borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md" overflowY="auto">
-              <StockComparison selectedStocks={selectedStocks} setSelectedStock={setSelectedStock} />
-            </Box>
-          </GridItem>
-
-          {/* Stock Details Section */}
-          <GridItem>
-            <Box height="100%" p={5} borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md" overflowY="auto">
-              {selectedStock ? (
-                <StockDetails
-                  selectedStock={selectedStock}
-                  setPortfolio={setPortfolio}
-                  portfolio={portfolio}
-                  isInPortfolio={portfolio.some((stock) => stock.symbol === selectedStock)}
-                  onAddToPortfolio={onAddToPortfolio} // ✅ Pass correct function
-                  onRemoveFromPortfolio={onRemoveFromPortfolio} // ✅ Pass correct function
-                />
-              ) : (
-                <Box textAlign="center" color="gray.500" mt={10}>
-                  <Heading size="md">Select a stock to view details</Heading>
-                </Box>
-              )}
-            </Box>
-          </GridItem>
-        </Grid>
-      </Box>
-    </ChakraProvider>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={3}>
+          <Card className="p-3 shadow-sm">
+            <Card.Header className="d-flex justify-content-between align-items-center">
+              <span>Portfolio ({portfolio.length})</span>
+              <Button 
+                variant="link" 
+                className="p-0 border-0" 
+                onClick={() => setShowPortfolio(!showPortfolio)}
+                aria-controls="portfolio-collapse" 
+                aria-expanded={showPortfolio}
+              >
+                {showPortfolio ? <BsChevronUp size={18} /> : <BsChevronDown size={18} />}
+              </Button>
+            </Card.Header>
+            <Collapse in={showPortfolio}>
+              <div id="portfolio-collapse">
+                <Card.Body>
+                  <Portfolio 
+                    portfolio={portfolio} 
+                    setPortfolio={setPortfolio} 
+                    toggleSelectStock={toggleSelectStock} 
+                    selectedStocks={selectedStocks}
+                  />
+                </Card.Body>
+              </div>
+            </Collapse>
+          </Card>
+        </Col>
+        <Col md={6}>
+          <Card className="p-3 shadow-sm">
+            {selectedStock ? (
+              <StockDetails
+                selectedStock={selectedStock}
+                setPortfolio={setPortfolio}
+                portfolio={portfolio}
+                isInPortfolio={portfolio.some(
+                  (stock) => stock.symbol === selectedStock
+                )}
+                onAddToPortfolio={onAddToPortfolio}
+                onRemoveFromPortfolio={onRemoveFromPortfolio}
+              />
+            ) : (
+              <p className="text-center text-muted">Select a stock to view details</p>
+            )}
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="p-3 shadow-sm">
+            <StockComparison selectedStocks={selectedStocks} setSelectedStocks={setSelectedStocks} />
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

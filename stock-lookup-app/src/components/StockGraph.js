@@ -1,27 +1,30 @@
-// src/components/StockGraph.js
 import React, { useEffect, useState } from 'react';
+import { Card, Button, Spinner, Alert } from 'react-bootstrap';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Box, FormControl, FormLabel, Button, Flex } from '@chakra-ui/react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
 const StockGraph = ({ symbols }) => {
   const [graphData, setGraphData] = useState([]);
-  const [dateRange, setDateRange] = useState('1D'); // Default to last day
-  const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 1))); // Start default to one day before today
-  const [endDate, setEndDate] = useState(new Date()); // End default to today
+  const [dateRange, setDateRange] = useState('1D');
+  const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 1)));
+  const [endDate, setEndDate] = useState(new Date());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchGraphData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         let query = '';
         
-        if (dateRange !== 'custom') {
-          query = `timeseries=${getDateRangeLimit(dateRange)}`;
-        } else {
+        if (dateRange === 'custom') {
           const start = startDate.toISOString().split('T')[0];
           const end = endDate.toISOString().split('T')[0];
           query = `from=${start}&to=${end}`;
+        } else {
+          query = `timeseries=${getDateRangeLimit(dateRange)}`;
         }
 
         const dataPromises = symbols.map(symbol =>
@@ -34,10 +37,11 @@ const StockGraph = ({ symbols }) => {
         );
 
         const results = await Promise.all(dataPromises);
-        const combinedData = mergeStockData(results);
-        setGraphData(combinedData);
+        setGraphData(mergeStockData(results));
       } catch (error) {
-        console.error('Error fetching stock graph data:', error);
+        setError('Error fetching stock graph data.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,131 +66,55 @@ const StockGraph = ({ symbols }) => {
 
   const getDateRangeLimit = (range) => {
     switch (range) {
-      case '1D':
-        return 1;
-      case '1W':
-        return 7;
-      case '1M':
-        return 30;
-      case '1Y':
-        return 365;
-      case '5Y':
-        return 1825;
-      default:
-        return 1;
+      case '1D': return 1;
+      case '1W': return 7;
+      case '1M': return 30;
+      case '1Y': return 365;
+      case '5Y': return 1825;
+      default: return 1;
     }
   };
 
-  const handleDateRangeClick = (range) => {
-    setDateRange(range);
-  };
-
   return (
-    <Box>
-      {/* Date Range Selection - Predefined Options */}
-      <FormControl mb={4}>
-        <FormLabel>Date Range Selection</FormLabel>
-        <Flex gap={2} wrap="wrap">
-          <Button
-            size="sm"
-            colorScheme={dateRange === '1D' ? 'teal' : 'gray'}
-            onClick={() => handleDateRangeClick('1D')}
-          >
-            Last Day
-          </Button>
-          <Button
-            size="sm"
-            colorScheme={dateRange === '1W' ? 'teal' : 'gray'}
-            onClick={() => handleDateRangeClick('1W')}
-          >
-            Last Week
-          </Button>
-          <Button
-            size="sm"
-            colorScheme={dateRange === '1M' ? 'teal' : 'gray'}
-            onClick={() => handleDateRangeClick('1M')}
-          >
-            Last Month
-          </Button>
-          <Button
-            size="sm"
-            colorScheme={dateRange === '1Y' ? 'teal' : 'gray'}
-            onClick={() => handleDateRangeClick('1Y')}
-          >
-            Last Year
-          </Button>
-          <Button
-            size="sm"
-            colorScheme={dateRange === '5Y' ? 'teal' : 'gray'}
-            onClick={() => handleDateRangeClick('5Y')}
-          >
-            Last 5 Years
-          </Button>
-        </Flex>
-      </FormControl>
-
-      {/* Custom Date Range Button */}
-      <FormControl mb={4}>
-        <Flex alignItems="center" gap={2}>
-          <Button
-            size="sm"
-            colorScheme={dateRange === 'custom' ? 'teal' : 'gray'}
-            onClick={() => handleDateRangeClick('custom')}
-          >
-            Custom
-          </Button>
-          {/* Custom Date Picker - Visible Only When Custom Date Range is Selected */}
-          {dateRange === 'custom' && (
-            <Flex gap={2} alignItems="center">
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                maxDate={new Date()}
-                dateFormat="yyyy/MM/dd"
-                className="custom-datepicker"
-              />
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate}
-                maxDate={new Date()}
-                dateFormat="yyyy/MM/dd"
-                className="custom-datepicker"
-              />
-            </Flex>
-          )}
-        </Flex>
-      </FormControl>
-
-      {/* Line Chart for Stock Data */}
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          data={graphData}
-          margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {symbols.map((symbol, index) => (
-            <Line
-              key={symbol}
-              type="monotone"
-              dataKey={symbol}
-              stroke={index === 0 ? '#8884d8' : '#82ca9d'}
-              strokeWidth={2}
-            />
+    <Card className="shadow-sm mt-4">
+      <Card.Header className="bg-primary text-white text-center">Stock Graph</Card.Header>
+      <Card.Body>
+        {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
+        {error && <Alert variant="danger">{error}</Alert>}
+        
+        <div className="d-flex justify-content-center gap-2 flex-wrap mb-3">
+          {['1D', '1W', '1M', '1Y', '5Y', 'custom'].map(range => (
+            <Button
+              key={range}
+              variant={dateRange === range ? 'primary' : 'outline-primary'}
+              onClick={() => setDateRange(range)}
+            >
+              {range}
+            </Button>
           ))}
-        </LineChart>
-      </ResponsiveContainer>
-    </Box>
+        </div>
+        
+        {dateRange === 'custom' && (
+          <div className="d-flex justify-content-center gap-2">
+            <DatePicker selected={startDate} onChange={setStartDate} selectsStart startDate={startDate} endDate={endDate} className="form-control" />
+            <DatePicker selected={endDate} onChange={setEndDate} selectsEnd startDate={startDate} endDate={endDate} className="form-control" />
+          </div>
+        )}
+        
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={graphData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {symbols.map((symbol, index) => (
+              <Line key={symbol} type="monotone" dataKey={symbol} stroke={index === 0 ? '#8884d8' : '#82ca9d'} strokeWidth={2} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </Card.Body>
+    </Card>
   );
 };
 

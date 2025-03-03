@@ -1,6 +1,6 @@
 //  src/components/StockComparison.js
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, Grid, GridItem, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Card, Spinner, Alert, Row, Col, Button } from 'react-bootstrap';
 import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
 
 const StockComparison = ({ selectedStocks, setSelectedStock }) => {
@@ -42,50 +42,42 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
   }, [selectedStocks]);
 
   return (
-    <Box p={5} mt={8} maxWidth="800px" mx="auto" textAlign="center">
-      <Heading size="lg" mb={4} textAlign="center">Stock Comparison</Heading>
+    <Card className="shadow-sm">
+      <Card.Header className="bg-primary text-white text-center">
+        Stock Comparison
+      </Card.Header>
+      <Card.Body>
+        {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
+        {error && <Alert variant="danger">{error}</Alert>}
 
-      {loading && <Spinner color="teal.600" size="lg" />}
-      {error && (
-        <Alert status="error" mb={4} borderRadius="md" boxShadow="lg">
-          <AlertIcon />
-          {error}
-        </Alert>
-      )}
-      {selectedStocks.length === 2 && stockDetails.length === 2 ? (
-        <Box>
-          <Heading size="md" mb={4} textAlign="center">
-            Comparing {stockDetails[0].companyName} and {stockDetails[1].companyName}
-          </Heading>
-          <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={6}>
-            {stockDetails.map(stock => (
-              <GridItem key={stock.symbol} border="1px solid #ccc" borderRadius="md" p={4} display="flex" flexDirection="column" justifyContent="space-between">
-                <Box mb={4}>
-                  <Heading size="md" mb={2}>{stock.companyName}</Heading>
-                  <Text><strong>Symbol:</strong> {stock.symbol}</Text>
-                  <Text><strong>Price:</strong> ${stock.price}</Text>
-                  <Text><strong>Industry:</strong> {stock.industry}</Text>
-                  <Text><strong>Sector:</strong> {stock.sector}</Text>
-                  <Text><strong>CEO:</strong> {stock.ceo}</Text>
-                </Box>
-                <Button
-                  colorScheme="teal"
-                  alignSelf="center"
-                  mt="auto"
-                  onClick={() => setSelectedStock(stock.symbol)}
-                >
-                  View Stock Details
-                </Button>
-              </GridItem>
-            ))}
-          </Grid>
-          <StockGraph symbols={selectedStocks} />
-        </Box>
-      ) : (
-        <Text>Select two stocks to compare.</Text>
-      )}
-    </Box>
+        {selectedStocks.length === 2 && stockDetails.length === 2 ? (
+          <>
+            <Row className="mb-3">
+              {stockDetails.map(stock => (
+                <Col key={stock.symbol} md={6}>
+                  <Card className="p-3">
+                    <Card.Title>{stock.companyName}</Card.Title>
+                    <Card.Text><strong>Symbol:</strong> {stock.symbol}</Card.Text>
+                    <Card.Text><strong>Price:</strong> ${stock.price}</Card.Text>
+                    <Card.Text><strong>Industry:</strong> {stock.industry}</Card.Text>
+                    <Card.Text><strong>Sector:</strong> {stock.sector}</Card.Text>
+                    <Card.Text><strong>CEO:</strong> {stock.ceo}</Card.Text>
+                    <Button variant="primary" onClick={() => setSelectedStock(stock.symbol)}>
+                      View Stock Details
+                    </Button>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+            <StockGraph symbols={selectedStocks} />
+          </>
+        ) : (
+          <p className="text-center text-muted">Select two stocks to compare.</p>
+        )}
+      </Card.Body>
+    </Card>
   );
 };
 
 export default StockComparison;
+

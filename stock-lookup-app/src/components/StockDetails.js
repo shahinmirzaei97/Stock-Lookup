@@ -1,7 +1,7 @@
 // src/components/StockDetails.js
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, Button, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
-import StockGraph from './StockGraph'; // Import the graph component
+import { Card, Spinner, Alert, Button } from 'react-bootstrap';
+import StockGraph from './StockGraph';
 import { addStockToPortfolio, removeStockFromPortfolio } from '../utils/portfolioUtils';
 
 const StockDetails = ({ selectedStock, setPortfolio, isInPortfolio }) => {
@@ -31,42 +31,39 @@ const StockDetails = ({ selectedStock, setPortfolio, isInPortfolio }) => {
   }, [selectedStock]);
 
   return (
-    <Box p={5} bg="gray.50" borderRadius="md" borderColor="teal.500" borderWidth="1px" boxShadow="md" height="100%" overflowY="auto">
-      {loading && <Spinner color="teal.600" />}
-      {error && (
-        <Alert status="error" mb={4} borderRadius="md" boxShadow="lg">
-          <AlertIcon />
-          {error}
-        </Alert>
-      )}
-      {stockDetails && (
-        <Box height="100%" overflowY="auto" display="flex" flexDirection="column">
-          <Heading size="lg" mb={4} color="teal.700">{stockDetails.companyName}</Heading>
-          <Text><strong>Symbol:</strong> {stockDetails.symbol}</Text>
-          <Text><strong>Price:</strong> ${stockDetails.price}</Text>
-          <Text><strong>Industry:</strong> {stockDetails.industry}</Text>
-          <Text><strong>Sector:</strong> {stockDetails.sector}</Text>
-          <Text><strong>CEO:</strong> {stockDetails.ceo}</Text>
-          <Text><strong>Description:</strong> {stockDetails.description}</Text>
+    <Card className="shadow-sm">
+      <Card.Header className="bg-primary text-white text-center">
+        Stock Details
+      </Card.Header>
+      <Card.Body>
+        {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
+        {error && <Alert variant="danger">{error}</Alert>}
 
-          {/* Display the stock graph */}
-          <Box mt={4} flex="1 1 auto">
+        {stockDetails && (
+          <>
+            <Card.Title>{stockDetails.companyName}</Card.Title>
+            <Card.Text><strong>Symbol:</strong> {stockDetails.symbol}</Card.Text>
+            <Card.Text><strong>Price:</strong> ${stockDetails.price}</Card.Text>
+            <Card.Text><strong>Industry:</strong> {stockDetails.industry}</Card.Text>
+            <Card.Text><strong>Sector:</strong> {stockDetails.sector}</Card.Text>
+            <Card.Text><strong>CEO:</strong> {stockDetails.ceo}</Card.Text>
+            <Card.Text><strong>Description:</strong> {stockDetails.description}</Card.Text>
+
             <StockGraph symbols={[selectedStock]} />
-          </Box>
 
-          {/* Button to add or remove stock from the portfolio */}
-          <Button
-        onClick={() => isInPortfolio 
-          ? removeStockFromPortfolio(selectedStock, setPortfolio) 
-          : addStockToPortfolio(selectedStock, setPortfolio)}
-        colorScheme={isInPortfolio ? "red" : "teal"}
-        mt={4}
-      >
-        {isInPortfolio ? 'Remove from Portfolio' : 'Add to Portfolio'}
-      </Button>
-        </Box>
-      )}
-    </Box>
+            <Button
+              variant={isInPortfolio ? "danger" : "primary"}
+              className="mt-3"
+              onClick={() => isInPortfolio
+                ? removeStockFromPortfolio(selectedStock, setPortfolio)
+                : addStockToPortfolio(selectedStock, setPortfolio)}
+            >
+              {isInPortfolio ? 'Remove from Portfolio' : 'Add to Portfolio'}
+            </Button>
+          </>
+        )}
+      </Card.Body>
+    </Card>
   );
 };
 
