@@ -6,6 +6,11 @@ import StockDetails from "./components/StockDetails";
 import { Container, Navbar, Row, Col, Card, Button, Collapse } from "react-bootstrap";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 
+const ACCENT_COLOR = "#0074E4"; // Deep Blue Accent
+const BACKGROUND_COLOR = "#2A2A2A"; // Lighter Grey for better contrast
+const CARD_BACKGROUND = "#3A3A3A"; // Slightly lighter grey for cards
+const TEXT_COLOR = "#FFFFFF";
+
 const App = () => {
   const [portfolio, setPortfolio] = useState([]);
   const [selectedStocks, setSelectedStocks] = useState([]);
@@ -62,9 +67,9 @@ const App = () => {
   };
 
   return (
-    <Container fluid>
-      <Navbar bg="dark" variant="dark" className="mb-4 px-4">
-        <Navbar.Brand>Stock Lookup</Navbar.Brand>
+    <Container fluid style={{ backgroundColor: BACKGROUND_COLOR, minHeight: "100vh", color: TEXT_COLOR }}>
+      <Navbar style={{ backgroundColor: BACKGROUND_COLOR }} variant="dark" className="mb-4 px-4 justify-content-center">
+        <Navbar.Brand style={{ color: TEXT_COLOR, fontSize: "1.5rem" }}>Stock Lookup</Navbar.Brand>
       </Navbar>
       <Row className="mb-4">
         <Col md={12}>
@@ -73,8 +78,8 @@ const App = () => {
       </Row>
       <Row>
         <Col md={3}>
-          <Card className="p-3 shadow-sm">
-            <Card.Header className="d-flex justify-content-between align-items-center">
+          <Card className="p-3 shadow-sm" style={{ backgroundColor: CARD_BACKGROUND, color: TEXT_COLOR }}>
+            <Card.Header className="d-flex justify-content-between align-items-center" style={{ backgroundColor: ACCENT_COLOR, color: "#FFFFFF" }}>
               <span>Portfolio ({portfolio.length})</span>
               <Button 
                 variant="link" 
@@ -82,6 +87,7 @@ const App = () => {
                 onClick={() => setShowPortfolio(!showPortfolio)}
                 aria-controls="portfolio-collapse" 
                 aria-expanded={showPortfolio}
+                style={{ color: "#FFFFFF" }}
               >
                 {showPortfolio ? <BsChevronUp size={18} /> : <BsChevronDown size={18} />}
               </Button>
@@ -101,7 +107,7 @@ const App = () => {
           </Card>
         </Col>
         <Col md={6}>
-          <Card className="p-3 shadow-sm">
+          <Card className="p-3 shadow-sm" style={{ backgroundColor: CARD_BACKGROUND, color: TEXT_COLOR }}>
             {selectedStock ? (
               <StockDetails
                 selectedStock={selectedStock}
@@ -119,7 +125,7 @@ const App = () => {
           </Card>
         </Col>
         <Col md={3}>
-          <Card className="p-3 shadow-sm">
+          <Card className="p-3 shadow-sm" style={{ backgroundColor: CARD_BACKGROUND, color: TEXT_COLOR }}>
             <StockComparison selectedStocks={selectedStocks} setSelectedStocks={setSelectedStocks} />
           </Card>
         </Col>

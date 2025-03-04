@@ -22,15 +22,12 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks 
   };
 
   return (
-    <Card className="shadow-sm">
-      <Card.Header className="bg-primary text-white text-center">
-        Your Portfolio
-      </Card.Header>
+    <Card className="shadow-sm" style={{ backgroundColor: "#3A3A3A", color: "#FFFFFF", border: "none" }}>
       <Card.Body>
         <p className="fw-bold">Total Value: ${portfolioValue.toFixed(2)}</p>
         <ListGroup>
           {portfolio.map((stock) => (
-            <ListGroup.Item key={stock.symbol} className="d-flex justify-content-between align-items-center">
+            <ListGroup.Item key={stock.symbol} className="d-flex justify-content-between align-items-center" style={{ backgroundColor: "#2A2A2A", color: "#FFFFFF", borderBottom: "1px solid #0074E4" }}>
               <div>
                 <Form.Check
                   type="checkbox"
@@ -47,7 +44,7 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks 
                 min={1}
                 max={100}
                 onChange={(e) => handleQuantityChange(stock.symbol, Number(e.target.value))}
-                style={{ width: '60px', display: 'inline-block' }}
+                style={{ width: '60px', display: 'inline-block', backgroundColor: "#4A4A4A", color: "#FFFFFF", border: "1px solid #0074E4" }}
               />
               <Button
                 variant="danger"

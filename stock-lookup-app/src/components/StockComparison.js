@@ -1,10 +1,9 @@
-//  src/components/StockComparison.js
 import React, { useEffect, useState } from 'react';
 import { Card, Spinner, Alert, Row, Col, Button } from 'react-bootstrap';
-import StockGraph from './StockGraph'; // Import the StockGraph component to display graphs
+import StockGraph from './StockGraph';
 
 const StockComparison = ({ selectedStocks, setSelectedStock }) => {
-  const [stockDetails, setStockDetails] = useState([]); // State to store details of selected stocks
+  const [stockDetails, setStockDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,11 +20,11 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
               }
               return response.json();
             })
-            .then(data => (data.length > 0 ? data[0] : null)) // Extract the first item from the response array
+            .then(data => (data.length > 0 ? data[0] : null))
         );
 
         const details = await Promise.all(detailsPromises);
-        const validDetails = details.filter(detail => detail !== null); // Filter out any null responses
+        const validDetails = details.filter(detail => detail !== null);
         setStockDetails(validDetails);
       } catch (error) {
         setError('Error fetching stock details for comparison. Please try again.');
@@ -35,17 +34,14 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
     };
 
     if (selectedStocks.length === 2) {
-      fetchStockDetails(); // Fetch details when two stocks are selected
+      fetchStockDetails();
     } else {
-      setStockDetails([]); // Clear stock details if less than two stocks are selected
+      setStockDetails([]);
     }
   }, [selectedStocks]);
 
   return (
-    <Card className="shadow-sm">
-      <Card.Header className="bg-primary text-white text-center">
-        Stock Comparison
-      </Card.Header>
+    <Card className="shadow-sm" style={{ backgroundColor: "#3A3A3A", color: "#FFFFFF", border: "none" }}>
       <Card.Body>
         {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
         {error && <Alert variant="danger">{error}</Alert>}
@@ -55,14 +51,14 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
             <Row className="mb-3">
               {stockDetails.map(stock => (
                 <Col key={stock.symbol} md={6}>
-                  <Card className="p-3">
+                  <Card className="p-3" style={{ backgroundColor: "#2A2A2A", color: "#FFFFFF", border: "1px solid #0074E4" }}>
                     <Card.Title>{stock.companyName}</Card.Title>
                     <Card.Text><strong>Symbol:</strong> {stock.symbol}</Card.Text>
                     <Card.Text><strong>Price:</strong> ${stock.price}</Card.Text>
                     <Card.Text><strong>Industry:</strong> {stock.industry}</Card.Text>
                     <Card.Text><strong>Sector:</strong> {stock.sector}</Card.Text>
                     <Card.Text><strong>CEO:</strong> {stock.ceo}</Card.Text>
-                    <Button variant="primary" onClick={() => setSelectedStock(stock.symbol)}>
+                    <Button variant="primary" style={{ backgroundColor: "#0074E4", border: "none" }} onClick={() => setSelectedStock(stock.symbol)}>
                       View Stock Details
                     </Button>
                   </Card>
@@ -80,4 +76,3 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
 };
 
 export default StockComparison;
-
