@@ -94,6 +94,7 @@ const App = () => {
                     setPortfolio={setPortfolio} 
                     toggleSelectStock={toggleSelectStock} 
                     selectedStocks={selectedStocks}
+                    setSelectedStock={setSelectedStock}
                   />
                 </Card.Body>
               </div>

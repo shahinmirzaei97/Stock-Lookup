@@ -1,7 +1,7 @@
-import React from 'react';
-import { Card, ListGroup, Button, Form, Row, Col } from 'react-bootstrap';
+import React from "react";
+import { Card, ListGroup, Button, Form} from "react-bootstrap";
 
-const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks }) => {
+const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks, setSelectedStock }) => {
   const portfolioValue = portfolio.reduce(
     (sum, stock) => sum + stock.price * stock.quantity,
     0
@@ -24,49 +24,51 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks 
   return (
     <Card className="app-card portfolio-card">
       <Card.Body>
-        <h5 className="text-center fw-bold">Portfolio</h5>
+        <h5 className="fw-bold text-center">Portfolio</h5>
         <p className="text-center text-muted">Total Value: <strong>${portfolioValue.toFixed(2)}</strong></p>
         {portfolio.length > 0 ? (
           <ListGroup className="portfolio-list">
             {portfolio.map((stock) => (
-              <ListGroup.Item key={stock.symbol} className="portfolio-item d-flex align-items-center justify-content-between">
-                <Row className="w-100 align-items-center">
-                  <Col xs={1} className="text-center">
+              <ListGroup.Item key={stock.symbol} className="portfolio-item">
+                <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                  <div className="d-flex align-items-center">
                     <Form.Check
                       type="checkbox"
                       checked={selectedStocks.includes(stock.symbol)}
                       onChange={() => toggleSelectStock(stock.symbol)}
                       disabled={selectedStocks.length >= 2 && !selectedStocks.includes(stock.symbol)}
-                      className="portfolio-checkbox"
+                      className="me-2"
                     />
-                  </Col>
-                  <Col xs={3} className="portfolio-symbol">
                     <strong>{stock.symbol}</strong>
-                  </Col>
-                  <Col xs={3} className="portfolio-price">
-                    ${stock.price.toFixed(2)}
-                  </Col>
-                  <Col xs={3}>
-                    <Form.Control
-                      type="number"
-                      value={stock.quantity}
-                      min={1}
-                      max={100}
-                      onChange={(e) => handleQuantityChange(stock.symbol, Number(e.target.value))}
-                      className="portfolio-quantity"
-                    />
-                  </Col>
-                  <Col xs={2} className="text-end">
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      className="portfolio-remove"
-                      onClick={() => handleRemoveStock(stock.symbol)}
-                    >
-                      ×
-                    </Button>
-                  </Col>
-                </Row>
+                  </div>
+                  <div>${stock.price.toFixed(2)}</div>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <Form.Control
+                    type="number"
+                    value={stock.quantity}
+                    min={1}
+                    max={100}
+                    onChange={(e) => handleQuantityChange(stock.symbol, Number(e.target.value))}
+                    className="w-auto"
+                    style={{ minWidth: "80px" }}
+                  />
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setSelectedStock(stock.symbol)}
+                  >
+                    View
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleRemoveStock(stock.symbol)}
+                  >
+                    ×
+                  </Button>
+                </div>
               </ListGroup.Item>
             ))}
           </ListGroup>
