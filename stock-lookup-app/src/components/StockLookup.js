@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Form, Card, ListGroup, Button, Spinner, Alert } from 'react-bootstrap';
 import { debounce } from '../utils/debounce';
 import { addStockToPortfolio } from '../utils/portfolioUtils';
@@ -56,8 +56,24 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
     addStockToPortfolio(symbol, setPortfolio);
   };
 
+  const searchRef = useRef();
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (searchRef.current && !searchRef.current.contains(event.target)) {
+      setSuggestions([]);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+
   return (
-    <Card className="app-card">
+    <Card className="app-card" ref={searchRef}>
       <Card.Body>
         <Form.Group className="mb-3">
           <Form.Control

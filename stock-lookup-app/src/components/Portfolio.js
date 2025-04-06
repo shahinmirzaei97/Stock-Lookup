@@ -24,7 +24,7 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks 
   return (
     <Card className="app-card portfolio-card">
       <Card.Body>
-        <h5 className="fw-bold text-center">Portfolio</h5>
+        <h5 className="text-center fw-bold">Portfolio</h5>
         <p className="text-center text-muted">Total Value: <strong>${portfolioValue.toFixed(2)}</strong></p>
         {portfolio.length > 0 ? (
           <ListGroup className="portfolio-list">
