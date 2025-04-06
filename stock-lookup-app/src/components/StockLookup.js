@@ -32,12 +32,9 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
     [setLoading, setError, setSuggestions]
   );
 
-  const fetchSuggestions = useCallback(
-    (query) => {
-      debouncedFetch(query);
-    },
-    [debouncedFetch]
-  );
+  const fetchSuggestions = useCallback((query) => {
+    debouncedFetch(query);
+  }, [debouncedFetch]);
 
   const handleInputChange = (event) => {
     const input = event.target.value.toUpperCase();
@@ -60,7 +57,7 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
   };
 
   return (
-    <Card className="shadow-sm" style={{ backgroundColor: "#3A3A3A", color: "#FFFFFF", border: "none" }}>
+    <Card className="app-card">
       <Card.Body>
         <Form.Group className="mb-3">
           <Form.Control
@@ -68,21 +65,19 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
             value={symbol}
             onChange={handleInputChange}
             placeholder="Search for a stock..."
-            style={{ backgroundColor: "#4A4A4A", color: "#FFFFFF", border: "1px solid #0074E4" }}
+            className="app-input"
           />
         </Form.Group>
-
         {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
         {error && <Alert variant="danger">{error}</Alert>}
-
         {suggestions.length > 0 && (
           <ListGroup>
             {suggestions.map((s) => (
-              <ListGroup.Item key={s.symbol} className="d-flex justify-content-between align-items-center" style={{ backgroundColor: "#2A2A2A", color: "#FFFFFF", borderBottom: "1px solid #0074E4" }}>
+              <ListGroup.Item key={s.symbol} className="app-list-item d-flex justify-content-between align-items-center">
                 <span onClick={() => handleViewDetails(s.symbol)}>{s.symbol} - {s.name}</span>
                 <div>
                   <Button variant="success" size="sm" className="me-2" onClick={() => handleAddToPortfolio(s.symbol)}>+</Button>
-                  <Button variant="primary" size="sm" onClick={() => handleViewDetails(s.symbol)}>View</Button>
+                  <Button variant="primary" size="sm" className="app-button" onClick={() => handleViewDetails(s.symbol)}>View</Button>
                 </div>
               </ListGroup.Item>
             ))}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, ListGroup, Button, Form } from 'react-bootstrap';
+import { Card, ListGroup, Button, Form, Row, Col } from 'react-bootstrap';
 
 const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks }) => {
   const portfolioValue = portfolio.reduce(
@@ -22,40 +22,57 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks 
   };
 
   return (
-    <Card className="shadow-sm" style={{ backgroundColor: "#3A3A3A", color: "#FFFFFF", border: "none" }}>
+    <Card className="app-card portfolio-card">
       <Card.Body>
-        <p className="fw-bold">Total Value: ${portfolioValue.toFixed(2)}</p>
-        <ListGroup>
-          {portfolio.map((stock) => (
-            <ListGroup.Item key={stock.symbol} className="d-flex justify-content-between align-items-center" style={{ backgroundColor: "#2A2A2A", color: "#FFFFFF", borderBottom: "1px solid #0074E4" }}>
-              <div>
-                <Form.Check
-                  type="checkbox"
-                  checked={selectedStocks.includes(stock.symbol)}
-                  onChange={() => toggleSelectStock(stock.symbol)}
-                  disabled={selectedStocks.length >= 2 && !selectedStocks.includes(stock.symbol)}
-                  className="me-2"
-                />
-                {stock.symbol}: ${stock.price.toFixed(2)}
-              </div>
-              <Form.Control
-                type="number"
-                value={stock.quantity}
-                min={1}
-                max={100}
-                onChange={(e) => handleQuantityChange(stock.symbol, Number(e.target.value))}
-                style={{ width: '60px', display: 'inline-block', backgroundColor: "#4A4A4A", color: "#FFFFFF", border: "1px solid #0074E4" }}
-              />
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => handleRemoveStock(stock.symbol)}
-              >
-                Remove
-              </Button>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+        <h5 className="fw-bold text-center">Portfolio</h5>
+        <p className="text-center text-muted">Total Value: <strong>${portfolioValue.toFixed(2)}</strong></p>
+        {portfolio.length > 0 ? (
+          <ListGroup className="portfolio-list">
+            {portfolio.map((stock) => (
+              <ListGroup.Item key={stock.symbol} className="portfolio-item d-flex align-items-center justify-content-between">
+                <Row className="w-100 align-items-center">
+                  <Col xs={1} className="text-center">
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectedStocks.includes(stock.symbol)}
+                      onChange={() => toggleSelectStock(stock.symbol)}
+                      disabled={selectedStocks.length >= 2 && !selectedStocks.includes(stock.symbol)}
+                      className="portfolio-checkbox"
+                    />
+                  </Col>
+                  <Col xs={3} className="portfolio-symbol">
+                    <strong>{stock.symbol}</strong>
+                  </Col>
+                  <Col xs={3} className="portfolio-price">
+                    ${stock.price.toFixed(2)}
+                  </Col>
+                  <Col xs={3}>
+                    <Form.Control
+                      type="number"
+                      value={stock.quantity}
+                      min={1}
+                      max={100}
+                      onChange={(e) => handleQuantityChange(stock.symbol, Number(e.target.value))}
+                      className="portfolio-quantity"
+                    />
+                  </Col>
+                  <Col xs={2} className="text-end">
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="portfolio-remove"
+                      onClick={() => handleRemoveStock(stock.symbol)}
+                    >
+                      ×
+                    </Button>
+                  </Col>
+                </Row>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        ) : (
+          <p className="text-center text-muted">No stocks in portfolio</p>
+        )}
       </Card.Body>
     </Card>
   );
