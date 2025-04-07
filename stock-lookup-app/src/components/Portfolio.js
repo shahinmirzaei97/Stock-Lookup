@@ -1,5 +1,5 @@
-import React from "react";
-import { Card, ListGroup, Button, Form} from "react-bootstrap";
+import React from 'react';
+import { Card, ListGroup, Button, Form } from 'react-bootstrap';
 
 const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks, setSelectedStock }) => {
   const portfolioValue = portfolio.reduce(
@@ -22,9 +22,9 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks,
   };
 
   return (
-    <Card className="app-card portfolio-card">
+    <Card className="app-card card-portfolio">
       <Card.Body>
-        <h5 className="fw-bold text-center">Portfolio</h5>
+        <h5 className="text-center section-title">Portfolio</h5>
         <p className="text-center text-muted">Total Value: <strong>${portfolioValue.toFixed(2)}</strong></p>
         {portfolio.length > 0 ? (
           <ListGroup className="portfolio-list">

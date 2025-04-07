@@ -3,6 +3,7 @@ import StockLookup from "./components/StockLookup";
 import StockComparison from "./components/StockComparison";
 import Portfolio from "./components/Portfolio";
 import StockDetails from "./components/StockDetails";
+import './styles/theme.css';
 import { Container, Navbar, Row, Col, Card, Button, Collapse } from "react-bootstrap";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 
@@ -12,7 +13,6 @@ const App = () => {
   const [selectedStock, setSelectedStock] = useState(null);
   const [showPortfolio, setShowPortfolio] = useState(true);
 
-  // Function to fetch stock price before adding to portfolio
   const fetchStockPrice = async (symbol) => {
     try {
       const response = await fetch(
@@ -63,8 +63,8 @@ const App = () => {
 
   return (
     <Container fluid className="app-container">
-      <Navbar className="app-navbar">
-        <Navbar.Brand className="app-title">Stock Lookup</Navbar.Brand>
+      <Navbar className="app-navbar justify-content-center">
+        <Navbar.Brand className="app-title text-center">Stock Lookup</Navbar.Brand>
       </Navbar>
       <Row className="mb-4">
         <Col md={12}>
@@ -103,6 +103,11 @@ const App = () => {
         </Col>
         <Col md={6}>
           <Card className="app-card">
+            <StockComparison selectedStocks={selectedStocks} setSelectedStock={setSelectedStock} />
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="app-card">
             {selectedStock ? (
               <StockDetails
                 selectedStock={selectedStock}
@@ -117,11 +122,6 @@ const App = () => {
             ) : (
               <p className="text-center text-muted">Select a stock to view details</p>
             )}
-          </Card>
-        </Col>
-        <Col md={3}>
-          <Card className="app-card">
-            <StockComparison selectedStocks={selectedStocks} setSelectedStocks={setSelectedStocks} />
           </Card>
         </Col>
       </Row>

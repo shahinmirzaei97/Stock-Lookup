@@ -58,29 +58,29 @@ const StockLookup = ({ setPortfolio, setSelectedStock }) => {
 
   const searchRef = useRef();
 
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (searchRef.current && !searchRef.current.contains(event.target)) {
-      setSuggestions([]);
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSuggestions([]);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <Card className="app-card" ref={searchRef}>
+    <Card className="app-card card-details mx-3" ref={searchRef}>
       <Card.Body>
+        <h5 className="section-title text-center mb-3">Search for a stock</h5>
         <Form.Group className="mb-3">
           <Form.Control
             type="text"
             value={symbol}
             onChange={handleInputChange}
-            placeholder="Search for a stock..."
+            placeholder="Search for a stock... (AAPL, META)"
             className="app-input"
           />
         </Form.Group>

@@ -1,13 +1,14 @@
-// src/components/StockDetails.js
 import React, { useEffect, useState } from 'react';
-import { Card, Spinner, Alert, Row, Col, Button } from 'react-bootstrap';
+import { Card, Spinner, Alert, Row, Col, Button, Collapse } from 'react-bootstrap';
 import StockGraph from './StockGraph';
 import { addStockToPortfolio, removeStockFromPortfolio } from '../utils/portfolioUtils';
+import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 
 const StockDetails = ({ selectedStock, setPortfolio, portfolio }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showGraph, setShowGraph] = useState(false);
 
   useEffect(() => {
     if (!selectedStock) return;
@@ -35,9 +36,9 @@ const StockDetails = ({ selectedStock, setPortfolio, portfolio }) => {
   const isInPortfolio = portfolio.some(stock => stock.symbol === details.symbol);
 
   return (
-    <Card className="app-card">
+    <Card className="app-card card-details">
       <Card.Body>
-        <h5 className="text-center fw-bold mb-3">{details.companyName}</h5>
+        <h5 className="text-center section-title">{details.companyName}</h5>
 
         <Row className="mb-2">
           <Col xs={6}><strong>Symbol:</strong> {details.symbol}</Col>
@@ -63,9 +64,31 @@ const StockDetails = ({ selectedStock, setPortfolio, portfolio }) => {
           </Button>
         )}
 
-        <div className="mt-4">
-          <StockGraph symbols={[details.symbol]} />
+        {details.description && (
+          <div className="mt-3">
+            <p className="text-muted" style={{ fontSize: '0.9rem' }}>{details.description}</p>
+          </div>
+        )}
+
+        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+          <h6 className="mb-0">Price History</h6>
+          <Button
+            variant="link"
+            onClick={() => setShowGraph(!showGraph)}
+            aria-controls="graph-collapse"
+            aria-expanded={showGraph}
+            className="p-0"
+            style={{ color: '#0056b3' }}
+          >
+            {showGraph ? <BsChevronUp /> : <BsChevronDown />}
+          </Button>
         </div>
+
+        <Collapse in={showGraph}>
+          <div id="graph-collapse">
+            <StockGraph symbols={[details.symbol]} />
+          </div>
+        </Collapse>
       </Card.Body>
     </Card>
   );

@@ -41,8 +41,9 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
   }, [selectedStocks]);
 
   return (
-    <Card className="shadow-sm" >
+    <Card className="app-card card-comparison">
       <Card.Body>
+        <h5 className="text-center section-title">Stock Comparison</h5>
         {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
         {error && <Alert variant="danger">{error}</Alert>}
 
@@ -51,7 +52,7 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
             <Row className="mb-3">
               {stockDetails.map(stock => (
                 <Col key={stock.symbol} md={6}>
-                  <Card className="p-3" >
+                  <Card className="p-3">
                     <Card.Title>{stock.companyName}</Card.Title>
                     <Card.Text><strong>Symbol:</strong> {stock.symbol}</Card.Text>
                     <Card.Text><strong>Price:</strong> ${stock.price}</Card.Text>
