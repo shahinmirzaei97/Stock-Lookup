@@ -22,7 +22,7 @@ const Portfolio = ({ portfolio, setPortfolio, toggleSelectStock, selectedStocks,
   };
 
   return (
-    <Card className="app-card card-portfolio">
+    <Card className="app-card card-details">
       <Card.Body>
         <h5 className="text-center section-title">Portfolio</h5>
         <p className="text-center text-muted">Total Value: <strong>${portfolioValue.toFixed(2)}</strong></p>

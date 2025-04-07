@@ -41,7 +41,7 @@ const StockComparison = ({ selectedStocks, setSelectedStock }) => {
   }, [selectedStocks]);
 
   return (
-    <Card className="app-card card-comparison">
+    <Card className="app-card card-details">
       <Card.Body>
         <h5 className="text-center section-title">Stock Comparison</h5>
         {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
